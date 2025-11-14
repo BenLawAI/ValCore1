@@ -20,11 +20,20 @@ class NetworkFallbackManager:
 
     def __init__(self, config_path: str = "config/network_config.json"):
         """Initialize network fallback manager"""
+        import os
+
         self.config = self._load_config(config_path)
         self.server_available = False
         self.offline_queue = queue.Queue()
         self.sync_in_progress = False
         self.conflict_log = []
+
+        # Load API key from environment
+        self.api_key = os.getenv('VALCORE_API_KEY')
+        if self.api_key:
+            logger.info("API key loaded for server authentication")
+        else:
+            logger.warning("No API key configured for network fallback")
 
         # Conflict log file
         self.conflict_log_file = Path("logs/conflict_log.json")
@@ -36,6 +45,23 @@ class NetworkFallbackManager:
         """Load configuration"""
         with open(path, 'r') as f:
             return json.load(f)
+
+    def _get_headers(self) -> Dict[str, str]:
+        """
+        Get HTTP headers including API key for authentication
+
+        Returns:
+            Dictionary of headers
+        """
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        # Add API key if available
+        if self.api_key:
+            headers['X-API-Key'] = self.api_key
+
+        return headers
 
     def get_server_url(self) -> str:
         """
@@ -93,6 +119,7 @@ class NetworkFallbackManager:
             response = requests.post(
                 f"{server_url}/api/process",
                 json=message,
+                headers=self._get_headers(),
                 timeout=self.config['connection_timeout']
             )
 

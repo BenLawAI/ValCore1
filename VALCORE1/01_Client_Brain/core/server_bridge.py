@@ -18,9 +18,18 @@ class ServerBridge:
 
     def __init__(self, config_path: str = "config/network_config.json"):
         """Initialize server bridge"""
+        import os
+
         self.config = self._load_config(config_path)
         self.server_available = False
         self.fallback_llm = None
+
+        # Load API key from environment
+        self.api_key = os.getenv('VALCORE_API_KEY')
+        if self.api_key:
+            logger.info("API key loaded for server authentication")
+        else:
+            logger.warning("No API key configured - server may reject requests if auth is enabled")
 
         # Build server URL
         if self.config.get('prefer_tailscale') and self.config.get('atom_tailscale_ip'):
@@ -64,6 +73,23 @@ class ServerBridge:
             config['prefer_tailscale'] = os.getenv('PREFER_TAILSCALE').lower() == 'true'
 
         return config
+
+    def _get_headers(self) -> Dict[str, str]:
+        """
+        Get HTTP headers including API key for authentication
+
+        Returns:
+            Dictionary of headers
+        """
+        headers = {
+            'Content-Type': 'application/json'
+        }
+
+        # Add API key if available
+        if self.api_key:
+            headers['X-API-Key'] = self.api_key
+
+        return headers
 
     def check_server_health(self) -> bool:
         """
