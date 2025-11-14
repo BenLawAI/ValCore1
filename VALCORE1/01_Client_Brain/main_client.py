@@ -63,8 +63,7 @@ class VALCOREClient:
         Args:
             text: Transcribed text from voice system
         """
-        # Security: Don't log user input (may contain sensitive data)
-        logger.info(f"[{self.active_room}] Processing user command ({len(text)} chars)")
+        logger.info(f"[{self.active_room}] User: {text}")
 
         # Check for system commands
         text_lower = text.lower()
@@ -109,8 +108,7 @@ class VALCOREClient:
         )
 
         if response:
-            # Security: Don't log response (may contain sensitive data)
-            logger.info(f"Generated response ({len(response)} chars)")
+            logger.info(f"Val: {response}")
 
             # Speak response
             self.voice.synthesize_speech(response)
