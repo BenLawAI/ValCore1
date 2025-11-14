@@ -1,0 +1,177 @@
+# VALCORE1 .gitignore
+
+# ============================================================================
+# Python
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# ============================================================================
+# VALCORE1 Specific
+# ============================================================================
+
+# Logs
+VALCORE1/01_Client_Brain/logs/*.log
+VALCORE1/02_Server_Brain/logs/*.log
+VALCORE1/04_Tools_Registry/logs/*.log
+*.log
+
+# Voice models and data
+VALCORE1/01_Client_Brain/models/wake_word/*.ppn
+VALCORE1/01_Client_Brain/models/speaker_embeddings/*.npy
+VALCORE1/01_Client_Brain/models/tts/*
+
+# Voice recordings (training data)
+VALCORE1/01_Client_Brain/recordings/
+*.wav
+*.mp3
+*.flac
+
+# Configuration files with secrets
+*.env
+.env.local
+.env.production
+
+# Voice profiles (may contain biometric data)
+VALCORE1/01_Client_Brain/config/voice_profiles/*.json
+!VALCORE1/01_Client_Brain/config/voice_profiles.json
+
+# MCP OAuth tokens (CRITICAL - never commit!)
+.valcore1/tokens/
+*_token.json
+*_credentials.json
+oauth_credentials/
+
+# API keys and secrets
+*_api_key.txt
+*_secret.txt
+client_secret*.json
+credentials.json
+
+# Library data (conversation logs - potentially sensitive)
+Library/daily/**/*.json
+Library/monthly/**/*.json
+Library/yearly/**/*.json
+Library/backups/**/*.json
+Library/rooms/**/*.json
+# Keep the structure but not the data
+!Library/daily/*/.gitkeep
+!Library/monthly/*/.gitkeep
+!Library/yearly/*/.gitkeep
+!Library/backups/*/.gitkeep
+!Library/rooms/*/.gitkeep
+
+# Val error logs (may contain diagnostic data)
+00_SETUP_ASSISTANT/04_VAL_ERROR_LOG/*.json
+00_SETUP_ASSISTANT/04_VAL_ERROR_LOG/*.txt
+!00_SETUP_ASSISTANT/04_VAL_ERROR_LOG/README.md
+
+# ============================================================================
+# IDEs and Editors
+# ============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+.\#*
+
+# ============================================================================
+# Operating Systems
+# ============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# Temporary Files
+# ============================================================================
+*.tmp
+*.bak
+*.backup
+*~
+.cache/
+
+# ============================================================================
+# Testing and Development
+# ============================================================================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ============================================================================
+# IMPORTANT: What SHOULD be committed
+# ============================================================================
+# ✅ All .py source files
+# ✅ All .json config templates (with placeholder values)
+# ✅ All .md documentation
+# ✅ All .ps1 and .sh scripts
+# ✅ requirements.txt files
+# ✅ Directory structure (.gitkeep files)
+# ✅ README files
+
+# ❌ DO NOT commit:
+# ❌ Actual API keys or OAuth tokens
+# ❌ Voice recordings or biometric data
+# ❌ Conversation logs or personal data
+# ❌ Log files
+# ❌ Python cache or compiled files
+# ❌ Virtual environments
