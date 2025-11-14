@@ -6,6 +6,8 @@ Semantic memory search using FAISS and sentence transformers
 import logging
 import json
 import pickle
+import os
+import time
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -51,10 +53,17 @@ class Librarian:
         self.index_file = self.library_path / "faiss_index.bin"
         self.metadata_file = self.library_path / "metadata.json"
 
+        # Save configuration (configurable via environment variables)
+        self.save_every_n_entries = int(os.getenv('FAISS_SAVE_EVERY_N', 10))
+        self.save_interval_seconds = int(os.getenv('FAISS_SAVE_INTERVAL', 300))  # 5 minutes
+        self.last_save_time = time.time()
+        self.unsaved_changes = False
+
         # Load existing index if available
         self.load_index()
 
         logger.info(f"Librarian initialized with {len(self.metadata)} entries")
+        logger.info(f"Save frequency: every {self.save_every_n_entries} entries or {self.save_interval_seconds}s")
 
     def add_conversation(self, room: str, text: str, metadata: Optional[Dict] = None):
         """
@@ -90,11 +99,15 @@ class Librarian:
 
             # Add metadata
             self.metadata.append(entry)
+            self.unsaved_changes = True
 
             logger.debug(f"Added conversation to library: {room}")
 
-            # Save to disk periodically (every 10 entries)
-            if len(self.metadata) % 10 == 0:
+            # Save to disk periodically based on entry count or time interval
+            should_save_by_count = len(self.metadata) % self.save_every_n_entries == 0
+            should_save_by_time = (time.time() - self.last_save_time) >= self.save_interval_seconds
+
+            if should_save_by_count or should_save_by_time:
                 self.save_index()
 
         except Exception as e:
@@ -188,14 +201,27 @@ class Librarian:
 
         return room_entries[:last_n]
 
-    def save_index(self):
-        """Save FAISS index and metadata to disk"""
+    def save_index(self, force: bool = False):
+        """
+        Save FAISS index and metadata to disk
+
+        Args:
+            force: Force save even if no unsaved changes
+        """
         try:
+            # Skip if no changes and not forced
+            if not force and not self.unsaved_changes:
+                logger.debug("No unsaved changes, skipping save")
+                return
+
             if self.index is not None:
                 faiss.write_index(self.index, str(self.index_file))
 
             with open(self.metadata_file, 'w') as f:
                 json.dump(self.metadata, f, indent=2)
+
+            self.last_save_time = time.time()
+            self.unsaved_changes = False
 
             logger.info(f"Index saved: {len(self.metadata)} entries")
 
@@ -245,8 +271,8 @@ class Librarian:
 
         logger.info(f"Index rebuilt with {len(self.metadata)} entries")
 
-        # Save
-        self.save_index()
+        # Force save after rebuild
+        self.save_index(force=True)
 
     def get_stats(self) -> Dict:
         """

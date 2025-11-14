@@ -1,0 +1,122 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# API Keys and Secrets
+**/api_keys.json
+**/secrets.json
+**/.picovoice_key
+**/.openai_key
+**/credentials.json
+
+# Data directories
+Library/
+**/vector_db/
+**/faiss_index/
+*.index
+*.pkl
+*.pickle
+
+# Voice recordings
+**/voice_recordings/
+**/audio_samples/
+*.wav
+*.mp3
+*.flac
+
+# Model files
+**/models/
+*.pt
+*.pth
+*.onnx
+*.bin
+*.safetensors
+
+# Backup files
+*.bak
+*.backup
+*_backup*
+
+# OS files
+Thumbs.db
+desktop.ini
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# SSL certificates (generate new ones, don't commit)
+*.key
+*.crt
+*.pem
+*.cer
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Configuration overrides (keep templates only)
+**/config/local_*.json
+**/config/production_*.json
