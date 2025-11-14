@@ -211,6 +211,50 @@ class ClientBridge:
             return f(*args, **kwargs)
         return decorated_function
 
+    def _validate_input(self, data: dict, required_fields: list = None, optional_fields: dict = None) -> tuple:
+        """
+        Validate input data with type checking and constraints
+
+        Args:
+            data: Input data dictionary
+            required_fields: List of required field names
+            optional_fields: Dict of optional fields with (type, max_length/max_value) tuples
+
+        Returns:
+            (is_valid, error_message) tuple
+        """
+        if data is None:
+            return False, "No JSON data provided"
+
+        # Check required fields
+        if required_fields:
+            for field in required_fields:
+                if field not in data or data[field] is None:
+                    return False, f"Missing required field: {field}"
+
+        # Validate optional fields with constraints
+        if optional_fields:
+            for field, (expected_type, constraint) in optional_fields.items():
+                if field in data and data[field] is not None:
+                    value = data[field]
+
+                    # Type check
+                    if not isinstance(value, expected_type):
+                        return False, f"Field '{field}' must be of type {expected_type.__name__}"
+
+                    # String length check
+                    if expected_type == str and isinstance(constraint, int):
+                        if len(value) > constraint:
+                            return False, f"Field '{field}' exceeds maximum length of {constraint} characters"
+
+                    # Numeric range check
+                    if expected_type == int and isinstance(constraint, tuple):
+                        min_val, max_val = constraint
+                        if value < min_val or value > max_val:
+                            return False, f"Field '{field}' must be between {min_val} and {max_val}"
+
+        return True, None
+
     def _register_routes(self):
         """Register Flask routes"""
 
@@ -236,9 +280,43 @@ class ClientBridge:
 
                 data = request.get_json()
 
+                # Validate input
+                valid, error_msg = self._validate_input(
+                    data,
+                    required_fields=['user_input'],
+                    optional_fields={
+                        'user_input': (str, 50000),  # Max 50KB input
+                        'session_id': (str, 100),
+                        'room': (str, 50)
+                    }
+                )
+
+                if not valid:
+                    logger.warning(f"Invalid input: {error_msg}")
+                    return jsonify({
+                        "error": "Invalid input",
+                        "message": error_msg
+                    }), 400
+
                 session_id = data.get('session_id', 'default')
                 user_input = data.get('user_input', '')
                 room = data.get('room', 'general')
+
+                # Validate room name against whitelist
+                valid_rooms = ['general', 'truck', 'invoice', 'legal']
+                if room not in valid_rooms:
+                    logger.warning(f"Invalid room name: {room}")
+                    return jsonify({
+                        "error": "Invalid room",
+                        "message": f"Room must be one of: {', '.join(valid_rooms)}"
+                    }), 400
+
+                # Check for empty input
+                if not user_input.strip():
+                    return jsonify({
+                        "error": "Empty input",
+                        "message": "user_input cannot be empty"
+                    }), 400
 
                 logger.info(f"Processing request from session {session_id} (room: {room})")
 
@@ -307,9 +385,43 @@ class ClientBridge:
             try:
                 data = request.get_json()
 
+                # Validate input
+                valid, error_msg = self._validate_input(
+                    data,
+                    required_fields=['query'],
+                    optional_fields={
+                        'query': (str, 10000),  # Max 10KB query
+                        'room': (str, 50),
+                        'max_results': (int, (1, 100))  # Between 1 and 100
+                    }
+                )
+
+                if not valid:
+                    logger.warning(f"Invalid search input: {error_msg}")
+                    return jsonify({
+                        "error": "Invalid input",
+                        "message": error_msg
+                    }), 400
+
                 query = data.get('query', '')
                 room = data.get('room')  # None = search all rooms
                 max_results = data.get('max_results', 10)
+
+                # Check for empty query
+                if not query.strip():
+                    return jsonify({
+                        "error": "Empty query",
+                        "message": "query cannot be empty"
+                    }), 400
+
+                # Validate room if specified
+                if room:
+                    valid_rooms = ['general', 'truck', 'invoice', 'legal']
+                    if room not in valid_rooms:
+                        return jsonify({
+                            "error": "Invalid room",
+                            "message": f"Room must be one of: {', '.join(valid_rooms)}"
+                        }), 400
 
                 logger.info(f"Searching library: {query}")
 
@@ -339,13 +451,32 @@ class ClientBridge:
             try:
                 data = request.get_json()
 
+                # Validate input
+                valid, error_msg = self._validate_input(
+                    data,
+                    required_fields=['room'],
+                    optional_fields={
+                        'room': (str, 50),
+                        'session_id': (str, 100)
+                    }
+                )
+
+                if not valid:
+                    logger.warning(f"Invalid room switch input: {error_msg}")
+                    return jsonify({
+                        "error": "Invalid input",
+                        "message": error_msg
+                    }), 400
+
                 session_id = data.get('session_id', 'default')
                 room_name = data.get('room')
 
-                if not room_name:
+                # Validate room name against whitelist
+                valid_rooms = ['general', 'truck', 'invoice', 'legal']
+                if room_name not in valid_rooms:
                     return jsonify({
-                        "error": "room parameter required",
-                        "status": "error"
+                        "error": "Invalid room",
+                        "message": f"Room must be one of: {', '.join(valid_rooms)}"
                     }), 400
 
                 if not self.room_manager:
