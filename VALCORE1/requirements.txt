@@ -1,116 +1,121 @@
 # VALCORE1 Complete Requirements
 # This combines both Client Brain and Server Brain dependencies
+#
+# IMPORTANT: Versions are pinned for reproducibility and security.
+# To update: Review changelog, test thoroughly, then update specific versions.
+# Last updated: 2025-01-14
 
 # ============================================================================
 # CORE DEPENDENCIES (Both Client and Server)
 # ============================================================================
 
 # Deep Learning
-torch>=2.0.0
-torchvision>=0.15.0
-torchaudio>=2.0.0
+torch==2.1.2
+torchvision==0.16.2
+torchaudio==2.1.2
 
 # Data Science
-numpy>=1.24.0
-scipy>=1.10.0
+numpy==1.26.4
+scipy==1.11.4
 
 # HTTP & Networking
-requests>=2.31.0
-urllib3>=2.0.0
-flask>=3.0.0
-flask-cors>=4.0.0
+requests==2.31.0
+urllib3==2.1.0
+flask==3.0.3
+flask-cors==5.0.0
 
 # Data Validation
-pydantic>=2.0.0
+pydantic==2.9.2
 
 # Utilities
-python-dotenv>=1.0.0
-PyYAML>=6.0.0
+python-dotenv==1.0.1
+PyYAML==6.0.2
 
 # System Monitoring
-psutil>=5.9.0
-pynvml>=11.5.0
+psutil==6.1.0
+pynvml==12.560.30
 
 # ============================================================================
 # CLIENT BRAIN DEPENDENCIES (Desktop - Windows)
 # ============================================================================
 
 # Voice Processing
-faster-whisper>=0.10.0
-openai-whisper>=20230314  # Fallback
+faster-whisper==1.0.3
+openai-whisper==20231117  # Fallback
 
 # Audio I/O
-sounddevice>=0.4.6
-soundfile>=0.12.0
-pyaudio>=0.2.13  # Alternative audio backend
+sounddevice==0.5.1
+soundfile==0.12.1
+pyaudio==0.2.14  # Alternative audio backend
 
 # Text-to-Speech (Kokoro placeholder - install separately)
-# TTS>=0.13.0  # Optional: Coqui TTS as alternative
+# TTS==0.22.0  # Optional: Coqui TTS as alternative
 
 # Wake Word Detection
-# pvporcupine>=2.2.0  # Requires Picovoice access key
+# pvporcupine==3.0.3  # Requires Picovoice access key
 
 # Speaker Verification
-resemblyzer>=0.1.1.dev0
+resemblyzer==0.1.1.dev0
 
 # Desktop Automation
-pyautogui>=0.9.54
-pillow>=10.0.0
-pytesseract>=0.3.10  # OCR support
-keyboard>=0.13.5
-pygetwindow>=0.0.9
+pyautogui==0.9.54
+pillow==10.4.0
+pytesseract==0.3.13  # OCR support
+keyboard==0.13.5
+pygetwindow==0.0.9
 
 # System Tray
-pystray>=0.19.5
+pystray==0.19.5
 
 # Windows-Specific
-pywin32>=306; sys_platform == 'win32'
+pywin32==308; sys_platform == 'win32'
 
 # ============================================================================
 # SERVER BRAIN DEPENDENCIES (ATOM - Linux)
 # ============================================================================
 
 # LLM Interface
-ollama>=0.1.0  # Ollama Python client
+ollama==0.4.4  # Ollama Python client
+schedule==1.2.2  # Task scheduling
 
 # Vector Database
-faiss-cpu>=1.7.4  # Use faiss-gpu if CUDA available on server
+faiss-cpu==1.8.0.post1  # Use faiss-gpu if CUDA available on server
 
 # Embeddings
-sentence-transformers>=2.2.0
-transformers>=4.30.0
+sentence-transformers==3.1.1
+transformers==4.45.2
 
 # NLP
-nltk>=3.8.0
-spacy>=3.6.0
+nltk==3.9.1
+spacy==3.8.2
 
 # ============================================================================
 # TESTING & QUALITY ASSURANCE
 # ============================================================================
 
 # Testing Framework
-pytest>=7.4.0
-pytest-cov>=4.1.0          # Coverage reporting
-pytest-mock>=3.11.1        # Mocking support
-pytest-timeout>=2.1.0      # Test timeouts
-pytest-xdist>=3.3.1        # Parallel test execution
+pytest==8.3.4
+pytest-cov==6.0.0          # Coverage reporting
+pytest-mock==3.14.0        # Mocking support
+pytest-timeout==2.3.1      # Test timeouts
+pytest-xdist==3.6.1        # Parallel test execution
 
 # ============================================================================
 # OPTIONAL DEPENDENCIES
 # ============================================================================
 
 # Development
-ipython>=8.12.0
-jupyter>=1.0.0
-black>=23.0.0
-flake8>=6.0.0
+ipython==8.31.0
+jupyter==1.1.1
+black==24.10.0
+flake8==7.1.1
 
 # Logging & Monitoring
-loguru>=0.7.0
-tqdm>=4.65.0
+loguru==0.7.3
+tqdm==4.67.1
 
 # Database (if needed for future expansion)
-sqlalchemy>=2.0.0
+sqlalchemy==2.0.36
 
 # ============================================================================
 # NOTES

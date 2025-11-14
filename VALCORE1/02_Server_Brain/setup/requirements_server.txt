@@ -1,30 +1,33 @@
 # VALCORE1 Server Brain Dependencies
+# Pinned versions for reproducibility and security
+# Last updated: 2025-01-14
+
 # LLM Interface
-ollama>=0.3.3
+ollama==0.4.4
 
 # Vector DB & Embeddings
-sentence-transformers>=3.1.1
-faiss-cpu>=1.8.0.post1
+sentence-transformers==3.1.1
+faiss-cpu==1.8.0.post1
 
 # Task Scheduling
-schedule>=1.2.2
+schedule==1.2.2
 
 # Monitoring
-pynvml>=12.560.30
-psutil>=6.0.0
+pynvml==12.560.30
+psutil==6.1.0
 
 # Web Framework (for client bridge)
-flask>=3.0.3
-flask-cors>=5.0.0
+flask==3.0.3
+flask-cors==5.0.0
 
 # Utilities
-python-dotenv>=1.0.1
-pydantic>=2.9.2
-numpy>=1.26.4
+python-dotenv==1.0.1
+pydantic==2.9.2
+numpy==1.26.4
 
 # Testing (optional but recommended)
-pytest>=7.4.0
-pytest-cov>=4.1.0
-pytest-mock>=3.11.1
-pytest-timeout>=2.1.0
-pytest-xdist>=3.3.1
+pytest==8.3.4
+pytest-cov==6.0.0
+pytest-mock==3.14.0
+pytest-timeout==2.3.1
+pytest-xdist==3.6.1

@@ -1,39 +1,42 @@
 # VALCORE1 Client Brain Dependencies
+# Pinned versions for reproducibility and security
+# Last updated: 2025-01-14
+
 # Voice System
 faster-whisper==1.0.3
-ctranslate2>=4.3.1
-pyav>=12.3.0
-kokoro-onnx>=0.1.1
-onnxruntime-gpu>=1.18.0
+ctranslate2==4.5.0
+pyav==13.1.0
+kokoro-onnx==0.1.1
+onnxruntime-gpu==1.20.1
 pvporcupine==3.0.2
-resemblyzer>=0.1.1.dev0
-pyaudio>=0.2.14
-sounddevice>=0.4.7
-numpy>=1.26.4
+resemblyzer==0.1.1.dev0
+pyaudio==0.2.14
+sounddevice==0.5.1
+numpy==1.26.4
 
 # LLM Interface
-ollama>=0.3.3
-torch>=2.4.1
-torchaudio>=2.4.1
+ollama==0.4.4
+torch==2.4.1
+torchaudio==2.4.1
 
 # Automation & System Integration
-pyautogui>=0.9.54
-pygetwindow>=0.0.9
-pytesseract>=0.3.13
-Pillow>=10.4.0
-keyboard>=0.13.5
+pyautogui==0.9.54
+pygetwindow==0.0.9
+pytesseract==0.3.13
+Pillow==10.4.0
+keyboard==0.13.5
 
 # System Tray
-pystray>=0.19.5
+pystray==0.19.5
 
 # Monitoring
-pynvml>=12.560.30
-psutil>=6.0.0
+pynvml==12.560.30
+psutil==6.1.0
 
 # Networking
-requests>=2.32.3
-aiohttp>=3.10.5
+requests==2.32.3
+aiohttp==3.11.7
 
 # Utilities
-python-dotenv>=1.0.1
-pydantic>=2.9.2
+python-dotenv==1.0.1
+pydantic==2.9.2
