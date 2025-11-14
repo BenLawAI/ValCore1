@@ -1,0 +1,19 @@
+{
+  "daily": {
+    "enabled": true,
+    "time": "02:00",
+    "timezone": "America/Los_Angeles",
+    "retention_days": 30,
+    "catchup_on_startup": true
+  },
+  "monthly": {
+    "enabled": true,
+    "day_of_month": 1,
+    "retention_months": 12
+  },
+  "yearly": {
+    "enabled": true,
+    "retention_years": 5
+  },
+  "backup_before_compression": true
+}

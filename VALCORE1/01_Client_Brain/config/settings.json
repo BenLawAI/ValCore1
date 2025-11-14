@@ -1,0 +1,22 @@
+{
+  "version": "1.0.0",
+  "debug_mode": false,
+  "log_level": "INFO",
+  "system_tray": {
+    "enabled": true,
+    "show_notifications": true
+  },
+  "automation": {
+    "typing_interval": 0.02,
+    "emergency_undo_buffer_size": 3,
+    "screenshot_directory": "logs/screenshots"
+  },
+  "health_monitoring": {
+    "enabled": true,
+    "gpu_temp_warning_threshold": 85,
+    "gpu_temp_critical_threshold": 90,
+    "ram_warning_threshold_percent": 85,
+    "disk_warning_threshold_gb": 10,
+    "check_interval_seconds": 30
+  }
+}

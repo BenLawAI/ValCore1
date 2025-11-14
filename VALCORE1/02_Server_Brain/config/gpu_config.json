@@ -1,0 +1,15 @@
+{
+  "blackwell_gb10": {
+    "device_id": 0,
+    "unified_memory_gb": 128,
+    "tasks": ["large_llm", "embeddings", "vector_search"],
+    "compute_type": "float16"
+  },
+  "ollama": {
+    "min_model": "qwen2.5:14b",
+    "recommended_model": "qwen2.5:32b",
+    "max_model": "qwen2.5:70b",
+    "context_window": 32768,
+    "gpu_layers": -1
+  }
+}

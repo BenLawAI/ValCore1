@@ -1,0 +1,57 @@
+{
+  "daily_compression": {
+    "max_tokens": 2000,
+    "target_tokens": 1500,
+    "preserve_categories": [
+      "decisions_made",
+      "action_items",
+      "key_facts_learned",
+      "error_patterns",
+      "code_changes",
+      "file_modifications"
+    ],
+    "discard_categories": [
+      "greeting_exchanges",
+      "duplicate_information",
+      "tangential_discussions",
+      "failed_attempts",
+      "debugging_chatter"
+    ],
+    "semantic_importance": {
+      "high": {
+        "threshold": 0.9,
+        "keep_percentage": 100,
+        "examples": ["project decisions", "system errors", "user preferences"]
+      },
+      "medium": {
+        "threshold": 0.7,
+        "keep_percentage": 70,
+        "examples": ["general discussions", "explanations", "examples"]
+      },
+      "low": {
+        "threshold": 0.5,
+        "keep_percentage": 30,
+        "examples": ["casual chat", "redundant info", "clarifications"]
+      }
+    }
+  },
+  "monthly_rollup": {
+    "max_tokens": 5000,
+    "target_tokens": 4000,
+    "aggregation_rules": {
+      "combine_similar_topics": true,
+      "merge_related_decisions": true,
+      "preserve_chronology": true,
+      "link_cross_references": true
+    }
+  },
+  "yearly_archive": {
+    "max_tokens": 10000,
+    "target_tokens": 8000,
+    "high_level_only": true,
+    "include_statistics": true
+  },
+  "backup_before_compression": true,
+  "backup_retention_days": 90,
+  "rollback_enabled": true
+}

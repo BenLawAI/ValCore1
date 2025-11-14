@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "debug_mode": false,
+  "log_level": "INFO",
+  "ollama": {
+    "base_url": "http://localhost:11434",
+    "default_model": "qwen2.5:14b",
+    "timeout": 120,
+    "stream": false
+  },
+  "librarian": {
+    "embeddings_model": "all-MiniLM-L6-v2",
+    "similarity_threshold": 0.7,
+    "max_results": 10,
+    "vector_dim": 384
+  },
+  "library_path": "/home/user/ValCore1/Library",
+  "server": {
+    "host": "0.0.0.0",
+    "port": 5000,
+    "max_workers": 4
+  }
+}

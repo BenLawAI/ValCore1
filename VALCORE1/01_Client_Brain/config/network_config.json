@@ -1,0 +1,15 @@
+{
+  "atom_local_ip": "192.168.1.121",
+  "atom_port": 11434,
+  "atom_tailscale_ip": "",
+  "prefer_tailscale": false,
+  "connection_timeout": 30,
+  "retry_attempts": 3,
+  "retry_backoff_base": 2,
+  "health_check_interval_seconds": 30,
+  "fallback": {
+    "enabled": true,
+    "model": "qwen2.5:7b",
+    "device_id": 1
+  }
+}

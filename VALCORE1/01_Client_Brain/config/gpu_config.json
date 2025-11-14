@@ -1,0 +1,16 @@
+{
+  "rtx_5070": {
+    "device_id": 0,
+    "tasks": ["whisper_stt", "wake_word", "kokoro_tts"],
+    "memory_gb": 10,
+    "max_batch_size": 8,
+    "compute_type": "float16"
+  },
+  "rtx_4070": {
+    "device_id": 1,
+    "tasks": ["small_llm_fallback"],
+    "memory_gb": 10,
+    "max_context_tokens": 4096,
+    "compute_type": "float16"
+  }
+}

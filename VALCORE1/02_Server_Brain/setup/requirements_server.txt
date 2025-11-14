@@ -1,0 +1,23 @@
+# VALCORE1 Server Brain Dependencies
+# LLM Interface
+ollama>=0.3.3
+
+# Vector DB & Embeddings
+sentence-transformers>=3.1.1
+faiss-cpu>=1.8.0.post1
+
+# Task Scheduling
+schedule>=1.2.2
+
+# Monitoring
+pynvml>=12.560.30
+psutil>=6.0.0
+
+# Web Framework (for client bridge)
+flask>=3.0.3
+flask-cors>=5.0.0
+
+# Utilities
+python-dotenv>=1.0.1
+pydantic>=2.9.2
+numpy>=1.26.4
