@@ -1,0 +1,22 @@
+# VALCORE1 Minimal Dependencies
+# Only essential packages for basic functionality
+# Use this for lightweight installations
+
+# API Server
+Flask==3.0.0
+flask-cors==4.0.0
+
+# LLM Interface
+ollama==0.1.7
+
+# Vector Search
+faiss-cpu==1.7.4
+sentence-transformers==2.2.2
+torch==2.1.2
+
+# Configuration & Environment
+python-dotenv==1.0.0
+
+# System Utilities
+psutil==5.9.6
+requests==2.31.0

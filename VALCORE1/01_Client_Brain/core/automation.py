@@ -168,12 +168,31 @@ class Automation:
         """
         try:
             import subprocess
+            import shlex
+            import os
 
             logger.info(f"Launching application: {app_name}")
 
-            # Try to launch
-            subprocess.Popen(app_name, shell=True)
+            # Security: Validate input - no shell metacharacters allowed
+            dangerous_chars = ['&', '|', ';', '$', '`', '\n', '>', '<', '(', ')']
+            if any(char in app_name for char in dangerous_chars):
+                logger.error(f"Rejected application launch - dangerous characters detected: {app_name}")
+                raise ValueError("Application name contains potentially dangerous characters")
 
+            # Security: Use shell=False to prevent command injection
+            # Split command properly if it contains arguments
+            if os.name == 'nt':  # Windows
+                # On Windows, pass as string but without shell=True for simple commands
+                # Or split if it's a path with spaces
+                subprocess.Popen(app_name, shell=False)
+            else:  # Unix-like
+                # On Unix, properly split the command
+                args = shlex.split(app_name)
+                subprocess.Popen(args, shell=False)
+
+        except ValueError as ve:
+            logger.error(f"Security violation when launching {app_name}: {ve}")
+            raise
         except Exception as e:
             logger.error(f"Failed to launch {app_name}: {e}")
 

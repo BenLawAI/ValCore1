@@ -1,0 +1,60 @@
+# VALCORE1 Dependencies
+# All versions are pinned for reproducibility and security
+# To update: pip install --upgrade <package> && pip freeze > requirements.txt
+
+# Core Dependencies
+Flask==3.0.0
+flask-cors==4.0.0
+Werkzeug==3.0.1
+
+# LLM & AI
+ollama==0.1.7
+torch==2.1.2
+transformers==4.36.2
+sentence-transformers==2.2.2
+
+# Vector Database
+faiss-cpu==1.7.4
+# For GPU support, use: faiss-gpu==1.7.4
+
+# Audio Processing (for voice system)
+pyaudio==0.2.14
+pyttsx3==2.90
+SpeechRecognition==3.10.1
+sounddevice==0.4.6
+soundfile==0.12.1
+
+# Screen Automation
+pyautogui==0.9.54
+pygetwindow==0.0.9
+Pillow==10.1.0
+pytesseract==0.3.10
+
+# System Monitoring
+psutil==5.9.6
+GPUtil==1.4.0
+nvidia-ml-py3==7.352.0
+
+# Utilities
+python-dotenv==1.0.0
+schedule==1.2.0
+python-dateutil==2.8.2
+requests==2.31.0
+
+# Data Processing
+numpy==1.26.2
+pandas==2.1.4
+
+# Security
+cryptography==41.0.7
+
+# Development & Testing (optional)
+pytest==7.4.3
+pytest-cov==4.1.0
+black==23.12.1
+flake8==6.1.0
+mypy==1.7.1
+
+# Logging & Monitoring
+colorlog==6.8.0
+python-json-logger==2.0.7

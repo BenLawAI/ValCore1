@@ -1,0 +1,38 @@
+# VALCORE1 Development Dependencies
+# Includes all runtime dependencies plus dev tools
+
+# Include all runtime dependencies
+-r requirements.txt
+
+# Development Tools
+ipython==8.18.1
+ipdb==0.13.13
+jupyter==1.0.0
+
+# Code Quality
+pylint==3.0.3
+autopep8==2.0.4
+isort==5.13.2
+pre-commit==3.6.0
+
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==2.0.0
+mkdocs==1.5.3
+
+# Testing
+pytest-asyncio==0.21.1
+pytest-mock==3.12.0
+pytest-timeout==2.2.0
+coverage==7.3.4
+factory-boy==3.3.0
+faker==21.0.0
+
+# Performance Profiling
+memory-profiler==0.61.0
+line-profiler==4.1.1
+py-spy==0.3.14
+
+# Security Scanning
+safety==2.3.5
+bandit==1.7.6

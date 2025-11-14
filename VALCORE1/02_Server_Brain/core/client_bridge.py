@@ -5,8 +5,14 @@ Flask server to receive and process client requests
 
 import logging
 import json
+import os
+import sys
+from pathlib import Path
 from typing import Dict
 from datetime import datetime
+
+# Add shared modules to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "03_Shared"))
 
 try:
     from flask import Flask, request, jsonify
@@ -15,6 +21,11 @@ try:
 except ImportError:
     FLASK_AVAILABLE = False
     logging.warning("Flask not available")
+
+from auth import APIAuth
+from config_loader import ConfigLoader
+from validators import validate_request, InputValidator
+from rate_limiter import rate_limit, get_rate_limiter
 
 logger = logging.getLogger(__name__)
 
@@ -38,9 +49,25 @@ class ClientBridge:
         self.librarian = librarian
         self.room_manager = room_manager
 
+        # Load environment configuration
+        ConfigLoader.load_env_file()
+
+        # Initialize authentication
+        auth_enabled = ConfigLoader.get_bool('API_AUTH_ENABLED', default=False)
+        auth_token = ConfigLoader.get_env('API_AUTH_TOKEN')
+        self.auth = APIAuth(enabled=auth_enabled, token=auth_token)
+
         # Create Flask app
         self.app = Flask(__name__)
-        CORS(self.app)  # Enable CORS for all routes
+
+        # Configure CORS with environment variables
+        allowed_origins = ConfigLoader.get_list('ALLOWED_CORS_ORIGINS', default=['*'])
+        if allowed_origins == ['*']:
+            logger.warning("CORS allows ALL origins - set ALLOWED_CORS_ORIGINS in .env for production!")
+            CORS(self.app)
+        else:
+            logger.info(f"CORS restricted to: {allowed_origins}")
+            CORS(self.app, origins=allowed_origins)
 
         # Register routes
         self._register_routes()
@@ -55,6 +82,7 @@ class ClientBridge:
         """Register Flask routes"""
 
         @self.app.route('/api/health', methods=['GET'])
+        @rate_limit(max_requests=120, window_seconds=60, per="minute")
         def health_check():
             """Health check endpoint"""
             uptime = (datetime.now() - self.start_time).total_seconds()
@@ -67,12 +95,22 @@ class ClientBridge:
             })
 
         @self.app.route('/api/process', methods=['POST'])
+        @rate_limit(max_requests=30, window_seconds=60, per="minute")
+        @self.auth.require_auth
+        @validate_request({
+            'user_input': {'type': 'string', 'required': True, 'min_length': 1, 'max_length': 10000},
+            'session_id': {'type': 'string', 'required': False, 'max_length': 64, 'pattern': InputValidator.PATTERNS['session_id']},
+            'room': {'type': 'string', 'required': False, 'max_length': 32, 'pattern': InputValidator.PATTERNS['room_name']},
+            'temperature': {'type': 'float', 'required': False, 'min_value': 0.0, 'max_value': 2.0},
+            'max_tokens': {'type': 'integer', 'required': False, 'min_value': 1, 'max_value': 100000}
+        })
         def process_request():
-            """Process client request"""
+            """Process client request (requires authentication)"""
             try:
                 self.request_count += 1
 
-                data = request.get_json()
+                # Use validated data
+                data = request.validated_data
 
                 session_id = data.get('session_id', 'default')
                 user_input = data.get('user_input', '')
@@ -139,10 +177,18 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/search', methods=['POST'])
+        @rate_limit(max_requests=60, window_seconds=60, per="minute")
+        @self.auth.require_auth
+        @validate_request({
+            'query': {'type': 'string', 'required': True, 'min_length': 1, 'max_length': 1000},
+            'room': {'type': 'string', 'required': False, 'max_length': 32, 'pattern': InputValidator.PATTERNS['room_name']},
+            'max_results': {'type': 'integer', 'required': False, 'min_value': 1, 'max_value': 100}
+        })
         def search_library():
-            """Search library"""
+            """Search library (requires authentication)"""
             try:
-                data = request.get_json()
+                # Use validated data
+                data = request.validated_data
 
                 query = data.get('query', '')
                 room = data.get('room')  # None = search all rooms
@@ -170,10 +216,17 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/room/switch', methods=['POST'])
+        @rate_limit(max_requests=20, window_seconds=60, per="minute")
+        @self.auth.require_auth
+        @validate_request({
+            'session_id': {'type': 'string', 'required': False, 'max_length': 64, 'pattern': InputValidator.PATTERNS['session_id']},
+            'room': {'type': 'string', 'required': True, 'max_length': 32, 'pattern': InputValidator.PATTERNS['room_name']}
+        })
         def switch_room():
-            """Switch room"""
+            """Switch room (requires authentication)"""
             try:
-                data = request.get_json()
+                # Use validated data
+                data = request.validated_data
 
                 session_id = data.get('session_id', 'default')
                 room_name = data.get('room')
@@ -212,8 +265,10 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/rooms', methods=['GET'])
+        @rate_limit(max_requests=100, window_seconds=60, per="minute")
+        @self.auth.require_auth
         def list_rooms():
-            """List available rooms"""
+            """List available rooms (requires authentication)"""
             try:
                 if not self.room_manager:
                     return jsonify({
