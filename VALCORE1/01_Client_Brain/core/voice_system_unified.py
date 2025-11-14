@@ -266,13 +266,20 @@ class VALVoiceSystem:
 
         Returns:
             True if speaker matches profile
+
+        Security:
+            Fails CLOSED (returns False) on errors when verification is enabled.
+            This prevents unauthorized access if the verification system fails.
         """
         if not self.speaker_verification_enabled:
+            logger.debug("Speaker verification disabled, allowing command")
             return True  # Allow if verification disabled
 
         if profile_name not in self.speaker_embeddings:
             logger.warning(f"Voice profile '{profile_name}' not found")
-            return True  # Allow if profile doesn't exist
+            # SECURITY: Fail closed if profile missing but verification enabled
+            logger.warning("SECURITY: Verification enabled but profile missing - blocking command")
+            return False
 
         try:
             # Preprocess audio
@@ -293,7 +300,9 @@ class VALVoiceSystem:
 
         except Exception as e:
             logger.error(f"Speaker verification error: {e}")
-            return True  # Allow on error
+            # SECURITY: Fail CLOSED, not open - block on error when verification enabled
+            logger.error("SECURITY: Verification failed with error - blocking command for safety")
+            return False
 
     def start_listening(self, callback: Callable[[str], None]):
         """
