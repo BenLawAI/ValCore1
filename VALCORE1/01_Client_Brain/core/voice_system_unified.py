@@ -71,9 +71,39 @@ class VALVoiceSystem:
         logger.info("VAL Voice System initialized successfully")
 
     def _load_config(self, path: str) -> dict:
-        """Load configuration from JSON file"""
+        """
+        Load configuration from JSON file with environment variable overrides
+
+        Environment variables take precedence over JSON config values.
+        This allows secrets to be stored outside of version control.
+        """
+        import os
+        from pathlib import Path as PathLib
+
+        # Load .env file if it exists (from project root)
+        try:
+            from dotenv import load_dotenv
+            env_path = PathLib(__file__).parent.parent.parent.parent / '.env'
+            if env_path.exists():
+                load_dotenv(dotenv_path=env_path)
+                logger.info(f"Loaded environment variables from {env_path}")
+        except ImportError:
+            logger.warning("python-dotenv not installed, environment variables from .env won't be loaded")
+        except Exception as e:
+            logger.warning(f"Could not load .env file: {e}")
+
+        # Load base configuration from JSON
         with open(path, 'r') as f:
-            return json.load(f)
+            config = json.load(f)
+
+        # Override with environment variables (secrets should come from env)
+        if 'wake_word' in config:
+            env_access_key = os.getenv('PICOVOICE_ACCESS_KEY')
+            if env_access_key:
+                config['wake_word']['access_key'] = env_access_key
+                logger.info("Using Picovoice access key from environment variable")
+
+        return config
 
     def _init_audio(self):
         """Initialize audio input device"""

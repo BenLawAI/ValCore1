@@ -41,9 +41,36 @@ class LargeLLM:
         self._verify_model()
 
     def _load_config(self, path: str) -> dict:
-        """Load configuration"""
+        """
+        Load configuration from JSON file with environment variable overrides
+
+        Environment variables take precedence over JSON config values.
+        """
+        import os
+        from pathlib import Path as PathLib
+
+        # Load .env file if it exists
+        try:
+            from dotenv import load_dotenv
+            env_path = PathLib(__file__).parent.parent.parent.parent / '.env'
+            if env_path.exists():
+                load_dotenv(dotenv_path=env_path)
+        except (ImportError, Exception):
+            pass  # Silently continue if .env loading fails
+
+        # Load base configuration from JSON
         with open(path, 'r') as f:
-            return json.load(f)
+            config = json.load(f)
+
+        # Override with environment variables
+        if os.getenv('OLLAMA_BASE_URL'):
+            config['ollama']['base_url'] = os.getenv('OLLAMA_BASE_URL')
+        if os.getenv('DEFAULT_LLM_MODEL'):
+            config['ollama']['default_model'] = os.getenv('DEFAULT_LLM_MODEL')
+        if os.getenv('LIBRARY_PATH'):
+            config['library_path'] = os.getenv('LIBRARY_PATH')
+
+        return config
 
     def _verify_model(self):
         """Verify default model is available"""

@@ -16,10 +16,11 @@
     "sample_rate": 24000
   },
   "wake_word": {
-    "access_key": "YOUR_PICOVOICE_ACCESS_KEY_HERE",
+    "access_key": "",
     "keyword_paths": ["config/Hey-Val_en_windows_v3_0_0.ppn"],
     "model_path": null,
-    "sensitivity": 0.7
+    "sensitivity": 0.7,
+    "_comment": "IMPORTANT: Set PICOVOICE_ACCESS_KEY in .env file, not here!"
   },
   "speaker_verification": {
     "enabled": true,

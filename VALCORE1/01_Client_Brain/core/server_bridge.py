@@ -34,9 +34,36 @@ class ServerBridge:
         logger.info(f"Server bridge initialized: {self.server_url}")
 
     def _load_config(self, path: str) -> dict:
-        """Load configuration from JSON file"""
+        """
+        Load configuration from JSON file with environment variable overrides
+
+        Environment variables take precedence over JSON config values.
+        """
+        import os
+        from pathlib import Path as PathLib
+
+        # Load .env file if it exists
+        try:
+            from dotenv import load_dotenv
+            env_path = PathLib(__file__).parent.parent.parent.parent / '.env'
+            if env_path.exists():
+                load_dotenv(dotenv_path=env_path)
+        except (ImportError, Exception):
+            pass  # Silently continue if .env loading fails
+
+        # Load base configuration from JSON
         with open(path, 'r') as f:
-            return json.load(f)
+            config = json.load(f)
+
+        # Override with environment variables
+        if os.getenv('ATOM_LOCAL_IP'):
+            config['atom_local_ip'] = os.getenv('ATOM_LOCAL_IP')
+        if os.getenv('ATOM_TAILSCALE_IP'):
+            config['atom_tailscale_ip'] = os.getenv('ATOM_TAILSCALE_IP')
+        if os.getenv('PREFER_TAILSCALE'):
+            config['prefer_tailscale'] = os.getenv('PREFER_TAILSCALE').lower() == 'true'
+
+        return config
 
     def check_server_health(self) -> bool:
         """
