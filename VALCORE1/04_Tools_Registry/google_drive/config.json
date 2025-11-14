@@ -1,0 +1,65 @@
+{
+  "name": "google_drive",
+  "enabled": false,
+  "priority": 7,
+  "description": "Google Drive integration for cloud file storage",
+
+  "settings": {
+    "oauth": {
+      "client_id_env": "GDRIVE_CLIENT_ID",
+      "client_secret_env": "GDRIVE_CLIENT_SECRET",
+      "token_path": "~/.valcore1/tokens/gdrive_token.json",
+      "scopes": [
+        "https://www.googleapis.com/auth/drive.file",
+        "https://www.googleapis.com/auth/drive.readonly"
+      ]
+    },
+
+    "file_options": {
+      "max_file_size_mb": 100,
+      "allowed_mime_types": [
+        "application/pdf",
+        "application/vnd.google-apps.document",
+        "application/vnd.google-apps.spreadsheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
+        "text/markdown"
+      ],
+      "download_format": "original",
+      "convert_google_docs": true
+    },
+
+    "search_options": {
+      "max_results": 100,
+      "include_trashed": false,
+      "search_shared_drives": false
+    },
+
+    "upload_options": {
+      "default_folder": "VALCORE1",
+      "create_folder_if_missing": true,
+      "overwrite_existing": false,
+      "share_by_default": false
+    }
+  },
+
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_minute": 20,
+    "burst_limit": 5
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 600,
+    "max_size_mb": 100
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/mcp_google_drive.log",
+    "rotate": true,
+    "max_size_mb": 10
+  }
+}

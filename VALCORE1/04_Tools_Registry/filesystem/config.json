@@ -1,0 +1,57 @@
+{
+  "name": "filesystem",
+  "enabled": true,
+  "priority": 1,
+  "description": "Local filesystem access for reading and writing files",
+
+  "settings": {
+    "allowed_directories": [
+      "A:\\000_START_HERE",
+      "A:\\Documents",
+      "A:\\Projects",
+      "A:\\Downloads",
+      "%USERPROFILE%\\Documents",
+      "%USERPROFILE%\\Desktop"
+    ],
+
+    "forbidden_paths": [
+      "C:\\Windows",
+      "C:\\Program Files",
+      "C:\\Program Files (x86)",
+      "%SYSTEMROOT%"
+    ],
+
+    "max_file_size_mb": 100,
+    "allowed_extensions": [
+      ".txt", ".md", ".json", ".py", ".js", ".ts",
+      ".html", ".css", ".xml", ".yaml", ".yml",
+      ".pdf", ".docx", ".xlsx", ".csv",
+      ".log", ".conf", ".ini", ".cfg"
+    ],
+
+    "operations": {
+      "read": true,
+      "write": true,
+      "delete": false,
+      "execute": false
+    }
+  },
+
+  "rate_limit": {
+    "enabled": false,
+    "requests_per_minute": 1000
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 60,
+    "max_size_mb": 50
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/mcp_filesystem.log",
+    "rotate": true,
+    "max_size_mb": 10
+  }
+}

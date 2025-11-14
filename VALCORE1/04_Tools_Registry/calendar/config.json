@@ -1,0 +1,69 @@
+{
+  "name": "calendar",
+  "enabled": false,
+  "priority": 5,
+  "description": "Google Calendar integration for schedule management",
+
+  "settings": {
+    "oauth": {
+      "client_id_env": "GCAL_CLIENT_ID",
+      "client_secret_env": "GCAL_CLIENT_SECRET",
+      "token_path": "~/.valcore1/tokens/calendar_token.json",
+      "scopes": [
+        "https://www.googleapis.com/auth/calendar.readonly",
+        "https://www.googleapis.com/auth/calendar.events"
+      ]
+    },
+
+    "calendar_options": {
+      "default_calendar": "primary",
+      "time_zone": "America/New_York",
+      "default_duration_minutes": 60,
+      "default_reminder_minutes": 15,
+      "include_declined": false
+    },
+
+    "event_options": {
+      "max_results": 50,
+      "look_ahead_days": 30,
+      "look_back_days": 7,
+      "show_all_day_events": true,
+      "show_recurring_events": true
+    },
+
+    "create_options": {
+      "confirm_before_create": true,
+      "send_notifications": true,
+      "add_description": true,
+      "description_prefix": "Created by VALCORE1"
+    },
+
+    "safety": {
+      "require_confirmation_for": [
+        "delete",
+        "modify_recurring",
+        "invite_multiple"
+      ],
+      "max_attendees": 20
+    }
+  },
+
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_minute": 30,
+    "burst_limit": 5
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 300,
+    "max_size_mb": 20
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/mcp_calendar.log",
+    "rotate": true,
+    "max_size_mb": 10
+  }
+}

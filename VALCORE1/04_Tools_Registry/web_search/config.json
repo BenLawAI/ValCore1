@@ -1,0 +1,63 @@
+{
+  "name": "web_search",
+  "enabled": false,
+  "priority": 5,
+  "description": "Internet search capabilities for research and information retrieval",
+
+  "settings": {
+    "provider": "duckduckgo",
+    "api_key_required": false,
+
+    "providers": {
+      "duckduckgo": {
+        "enabled": true,
+        "api_key_required": false,
+        "rate_limit": 100
+      },
+      "google": {
+        "enabled": false,
+        "api_key_required": true,
+        "api_key_env": "GOOGLE_SEARCH_API_KEY",
+        "cx_env": "GOOGLE_SEARCH_CX"
+      },
+      "bing": {
+        "enabled": false,
+        "api_key_required": true,
+        "api_key_env": "BING_SEARCH_API_KEY"
+      }
+    },
+
+    "search_options": {
+      "max_results": 10,
+      "safe_search": true,
+      "timeout_seconds": 10,
+      "user_agent": "VALCORE1/1.0"
+    },
+
+    "content_extraction": {
+      "enabled": true,
+      "max_page_size_kb": 500,
+      "extract_text": true,
+      "extract_images": false
+    }
+  },
+
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_minute": 20,
+    "burst_limit": 5
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 3600,
+    "max_size_mb": 100
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/mcp_web_search.log",
+    "rotate": true,
+    "max_size_mb": 10
+  }
+}

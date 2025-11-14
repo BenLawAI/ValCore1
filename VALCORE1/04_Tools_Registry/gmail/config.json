@@ -1,0 +1,64 @@
+{
+  "name": "gmail",
+  "enabled": false,
+  "priority": 5,
+  "description": "Gmail integration for email management",
+
+  "settings": {
+    "oauth": {
+      "client_id_env": "GMAIL_CLIENT_ID",
+      "client_secret_env": "GMAIL_CLIENT_SECRET",
+      "token_path": "~/.valcore1/tokens/gmail_token.json",
+      "scopes": [
+        "https://www.googleapis.com/auth/gmail.readonly",
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/gmail.compose",
+        "https://www.googleapis.com/auth/gmail.modify"
+      ]
+    },
+
+    "email_options": {
+      "max_results": 50,
+      "include_spam_trash": false,
+      "mark_as_read": false,
+      "auto_label": true
+    },
+
+    "send_options": {
+      "default_signature": true,
+      "signature_text": "\n\nSent via VALCORE1",
+      "confirm_before_send": true,
+      "save_to_sent": true
+    },
+
+    "safety": {
+      "block_domains": [],
+      "require_confirmation_for": [
+        "delete",
+        "archive",
+        "send_to_multiple"
+      ],
+      "max_recipients": 10
+    }
+  },
+
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_minute": 30,
+    "burst_limit": 5
+  },
+
+  "cache": {
+    "enabled": true,
+    "ttl_seconds": 300,
+    "max_size_mb": 50
+  },
+
+  "logging": {
+    "level": "INFO",
+    "file": "logs/mcp_gmail.log",
+    "rotate": true,
+    "max_size_mb": 10,
+    "log_email_content": false
+  }
+}
