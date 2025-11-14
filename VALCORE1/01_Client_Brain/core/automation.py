@@ -159,23 +159,70 @@ class Automation:
             logger.error(f"OCR error: {e}")
             return f"OCR failed: {e}"
 
-    def launch_application(self, app_name: str):
+    def launch_application(self, app_name: str) -> bool:
         """
         Launch an application (Windows only)
 
+        SECURITY: Uses shell=False to prevent command injection attacks.
+        Validates input and properly handles paths with spaces.
+
         Args:
-            app_name: Application name or path
+            app_name: Application name or path (can include arguments)
+
+        Returns:
+            True if launched successfully, False otherwise
+
+        Example:
+            launch_application("notepad.exe")
+            launch_application("C:\\Program Files\\App\\program.exe --flag")
         """
         try:
             import subprocess
+            import shlex
+            import os
 
             logger.info(f"Launching application: {app_name}")
 
-            # Try to launch
-            subprocess.Popen(app_name, shell=True)
+            # Security: Validate input to prevent obvious injection attempts
+            dangerous_chars = ['&', '|', ';', '\n', '\r', '`', '$', '(', ')']
+            if any(char in app_name for char in dangerous_chars):
+                logger.error(f"Rejected potentially dangerous application name: {app_name}")
+                return False
 
+            # Parse command line arguments safely
+            # shlex.split handles quoted paths with spaces correctly
+            try:
+                cmd_parts = shlex.split(app_name, posix=False)  # posix=False for Windows paths
+            except ValueError as e:
+                logger.error(f"Failed to parse application command: {e}")
+                return False
+
+            if not cmd_parts:
+                logger.error("Empty application name provided")
+                return False
+
+            # Security: Use shell=False to prevent command injection
+            # Pass command as list instead of string
+            subprocess.Popen(
+                cmd_parts,
+                shell=False,  # CRITICAL: Prevents command injection
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+
+            logger.info(f"Successfully launched: {cmd_parts[0]}")
+            return True
+
+        except FileNotFoundError as e:
+            logger.error(f"Application not found: {app_name} - {e}")
+            return False
+        except PermissionError as e:
+            logger.error(f"Permission denied to launch: {app_name} - {e}")
+            return False
         except Exception as e:
             logger.error(f"Failed to launch {app_name}: {e}")
+            return False
 
     def close_active_window(self):
         """Close the currently active window"""
