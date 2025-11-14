@@ -255,7 +255,8 @@ class VALVoiceSystem:
             # Combine all segments
             text = " ".join([segment.text for segment in segments]).strip()
 
-            logger.info(f"Transcribed: {text}")
+            # Security: Don't log transcribed text (may contain sensitive data)
+            logger.info(f"Transcribed audio ({len(text)} chars, {info.duration:.1f}s)")
             return text
 
         except Exception as e:
@@ -273,13 +274,14 @@ class VALVoiceSystem:
             Audio data as numpy array or None if TTS unavailable
         """
         if not self.tts_available:
-            logger.warning(f"TTS not available, would speak: {text}")
+            # Security: Don't log text content (may contain sensitive data)
+            logger.warning(f"TTS not available (text_length: {len(text)} chars)")
             return None
 
         try:
             # TODO: Implement Kokoro TTS synthesis
-            # For now, just log the text
-            logger.info(f"TTS: {text}")
+            # Security: Don't log text content (may contain sensitive data)
+            logger.info(f"TTS synthesizing ({len(text)} chars)")
             return None
 
         except Exception as e:

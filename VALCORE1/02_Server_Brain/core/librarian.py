@@ -159,7 +159,8 @@ class Librarian:
                 if len(results) >= max_results:
                     break
 
-            logger.info(f"Search '{query}' returned {len(results)} results")
+            # Security: Don't log query content (may contain sensitive data)
+            logger.info(f"Search completed (query_length: {len(query)} chars, results: {len(results)}, room: {room})")
             return results
 
         except Exception as e:

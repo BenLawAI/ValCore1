@@ -240,7 +240,8 @@ class ClientBridge:
                 user_input = data.get('user_input', '')
                 room = data.get('room', 'general')
 
-                logger.info(f"Processing request from session {session_id} (room: {room})")
+                # Security: Don't log user input (may contain sensitive data)
+                logger.info(f"Processing request from session {session_id} (room: {room}, input_length: {len(user_input)} chars)")
 
                 # Get room configuration
                 if self.room_manager:
@@ -311,7 +312,8 @@ class ClientBridge:
                 room = data.get('room')  # None = search all rooms
                 max_results = data.get('max_results', 10)
 
-                logger.info(f"Searching library: {query}")
+                # Security: Don't log query content (may contain sensitive data)
+                logger.info(f"Searching library (query_length: {len(query)} chars, room: {room}, max_results: {max_results})")
 
                 results = self.librarian.search(
                     query=query,
