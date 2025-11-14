@@ -15,6 +15,7 @@ from core.librarian import Librarian
 from core.memory_compression import MemoryCompressor
 from core.room_manager import RoomManager
 from core.client_bridge import ClientBridge
+from core.backup_manager import BackupManager
 
 # Configure logging
 logging.basicConfig(
@@ -74,6 +75,9 @@ class VALCOREServer:
             # Memory Compressor
             self.compressor = MemoryCompressor('config/compression_strategy.json', self.librarian)
 
+            # Backup Manager
+            self.backup_manager = BackupManager(library_path)
+
             # Client Bridge
             self.bridge = ClientBridge(self.llm, self.librarian, self.room_manager)
 
@@ -89,6 +93,16 @@ class VALCOREServer:
             # Start compression scheduler
             logger.info("Starting compression scheduler...")
             self.compressor.start_scheduler()
+
+            # Start backup scheduler
+            logger.info("Starting backup scheduler...")
+            self.backup_manager.start_scheduled_backups()
+
+            # Create initial backup on startup
+            import os
+            if os.getenv('BACKUP_ON_STARTUP', 'true').lower() == 'true':
+                logger.info("Creating startup backup...")
+                self.backup_manager.create_backup(tag='startup')
 
             # Start server
             logger.info("Starting client bridge server...")
@@ -111,6 +125,9 @@ class VALCOREServer:
 
         if hasattr(self, 'compressor'):
             self.compressor.stop_scheduler()
+
+        if hasattr(self, 'backup_manager'):
+            self.backup_manager.stop_scheduled_backups()
 
         if hasattr(self, 'librarian'):
             self.librarian.save_index()

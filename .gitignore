@@ -40,6 +40,9 @@ Library/
 **/yearly/*.json
 **/backups/*.json
 
+# Backup Files (Automated backups of Library data)
+Backups/
+
 # Logs
 logs/
 *.log
