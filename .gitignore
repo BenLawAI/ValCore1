@@ -1,0 +1,316 @@
+# ==============================================================================
+# VALCORE1 .gitignore
+# Prevents sensitive files and build artifacts from being committed
+# ==============================================================================
+
+# ==============================================================================
+# SECRETS & CREDENTIALS (CRITICAL - DO NOT COMMIT)
+# ==============================================================================
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+*_credentials.json
+*_secrets.json
+**/*_key.json
+**/access_key.json
+
+# Picovoice API Keys
+**/YOUR_PICOVOICE_ACCESS_KEY*
+**/picovoice_*.key
+
+# Voice Profiles & Embeddings
+**/voice_profiles/*.embeddings
+**/voice_profiles/*.npy
+voice_profiles.json
+
+# ==============================================================================
+# VALCORE1 SPECIFIC DATA
+# ==============================================================================
+
+# Library Data (Persistent Memory)
+Library/
+**/faiss_index.bin
+**/metadata.json
+**/daily/*.json
+**/monthly/*.json
+**/yearly/*.json
+**/backups/*.json
+
+# Logs
+logs/
+*.log
+**/*.log
+**/screenshots/*.png
+**/health_metrics.csv
+
+# Configuration with secrets
+# (Keep templates, ignore populated configs)
+**/config/voice_config.json
+**/config/network_config_local.json
+
+# ==============================================================================
+# PYTHON
+# ==============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+valcore_env/
+valcore1_env/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+pytestdebug.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# Mr Developer
+.mr.developer.cfg
+.project
+.pydevproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# ==============================================================================
+# IDEs & EDITORS
+# ==============================================================================
+
+# VSCode
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# ==============================================================================
+# OPERATING SYSTEMS
+# ==============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
+
+# ==============================================================================
+# AUDIO & MEDIA FILES (Large files - should be external)
+# ==============================================================================
+*.wav
+*.mp3
+*.ogg
+*.flac
+*.aac
+*.wma
+*.m4a
+
+# Except sample files
+!**/samples/*.wav
+!**/test_audio/*.wav
+
+# ==============================================================================
+# MODEL WEIGHTS & LARGE BINARIES
+# ==============================================================================
+*.onnx
+*.pt
+*.pth
+*.bin
+*.h5
+*.pkl
+*.pickle
+*.joblib
+
+# Except required model files
+!**/models/kokoro*.onnx
+!**/models/Hey-Val*.ppn
+
+# ==============================================================================
+# BACKUP & TEMPORARY FILES
+# ==============================================================================
+*.bak
+*.tmp
+*.temp
+*~
+*.old
+*.orig
+*.save
+.backup/
+backups/*.json.bak
+
+# ==============================================================================
+# DATABASES
+# ==============================================================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ==============================================================================
+# MISC
+# ==============================================================================
+.env.local
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+*.pid
+*.seed
+*.pid.lock
+.grunt
+bower_components
+node_modules/
+jspm_packages/
+
+# ==============================================================================
+# PROJECT SPECIFIC EXCLUSIONS
+# ==============================================================================
+
+# Keep structure but ignore content
+Library/*
+!Library/.gitkeep
+
+# Test outputs
+test_outputs/
+test_results/
+
+# Performance profiling
+*.prof
+*.lprof
+profile_*.txt
