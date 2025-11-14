@@ -82,7 +82,49 @@ This repository contains the **foundational structure** and **core modules** for
    - GPU_OPTIMIZATION.md
    - REMOTE_ACCESS.md
 
-## Quick Start (When Complete)
+## 🚀 Getting Started
+
+### Step 1: Install Dependencies
+
+**Windows (Client):**
+```powershell
+# Quick check what's already installed
+.\check_dependencies.ps1
+
+# Download and install everything
+.\download_dependencies.ps1
+```
+
+**Linux (Server):**
+```bash
+# Download and install server dependencies
+chmod +x download_dependencies_server.sh
+./download_dependencies_server.sh
+```
+
+📖 **See:** `DEPENDENCY_SCRIPTS_README.md` for detailed documentation
+
+### Step 2: Follow Setup Instructions
+
+📖 **See:** `SETUP_INSTRUCTIONS.md` for step-by-step guided setup
+
+Copy each section and paste it to Claude for interactive guidance through:
+- Prerequisites verification
+- Python environment setup
+- Picovoice wake word configuration
+- ATOM server setup
+- First run and testing
+
+### Step 3: Configure & Run
+
+1. Get Picovoice access key from [console.picovoice.ai](https://console.picovoice.ai/)
+2. Update `VALCORE1/01_Client_Brain/config/voice_config.json`
+3. Run: `python VALCORE1/01_Client_Brain/main_client.py`
+4. Say "Hey Val" to activate!
+
+---
+
+## Quick Start (Legacy - When Complete)
 
 ### For Ben (After Full Implementation)
 1. Extract VALCORE1 to `A:\000_START_HERE\VALCORE1_ROOT\Systems\`
