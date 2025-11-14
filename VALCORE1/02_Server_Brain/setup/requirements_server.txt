@@ -19,6 +19,7 @@ psutil==6.1.0
 # Web Framework (for client bridge)
 flask==3.0.3
 flask-cors==5.0.0
+flask-limiter==3.8.0  # Rate limiting for API protection
 
 # Utilities
 python-dotenv==1.0.1

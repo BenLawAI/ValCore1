@@ -23,6 +23,7 @@ requests==2.31.0
 urllib3==2.1.0
 flask==3.0.3
 flask-cors==5.0.0
+flask-limiter==3.8.0  # Rate limiting for API protection
 
 # Data Validation
 pydantic==2.9.2

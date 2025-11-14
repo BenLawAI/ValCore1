@@ -18,6 +18,14 @@ except ImportError:
     FLASK_AVAILABLE = False
     logging.warning("Flask not available")
 
+try:
+    from flask_limiter import Limiter
+    from flask_limiter.util import get_remote_address
+    LIMITER_AVAILABLE = True
+except ImportError:
+    LIMITER_AVAILABLE = False
+    logging.warning("Flask-Limiter not available - rate limiting disabled")
+
 logger = logging.getLogger(__name__)
 
 
@@ -49,6 +57,9 @@ class ClientBridge:
         # Configure CORS with restricted origins (security)
         self._configure_cors()
 
+        # Configure rate limiting (security)
+        self._configure_rate_limiting()
+
         # Register routes
         self._register_routes()
 
@@ -56,7 +67,7 @@ class ClientBridge:
         self.start_time = datetime.now()
         self.request_count = 0
 
-        logger.info("Client bridge initialized with authentication")
+        logger.info("Client bridge initialized with authentication and rate limiting")
 
     def _load_api_key(self):
         """
@@ -168,6 +179,54 @@ class ClientBridge:
         logger.warning(f"CORS: Rejected origin {origin} from {request.remote_addr}")
         return False
 
+    def _configure_rate_limiting(self):
+        """
+        Configure rate limiting to prevent API abuse and DoS attacks
+
+        Rate limits are configured per IP address:
+        - Default: 100 requests per minute for authenticated clients
+        - Health endpoint: 30 requests per minute (public endpoint)
+        - Process endpoint: 10 requests per minute (LLM calls are expensive)
+        - Search endpoint: 30 requests per minute
+        - Room operations: 20 requests per minute
+
+        Storage: In-memory (default) or Redis for distributed systems
+
+        Configuration via environment variables:
+        - RATE_LIMIT_ENABLED: Enable/disable rate limiting (default: true)
+        - RATE_LIMIT_DEFAULT: Default rate limit (default: "100 per minute")
+        - RATE_LIMIT_STORAGE: Storage backend URL (default: "memory://")
+        """
+        if not LIMITER_AVAILABLE:
+            logger.warning("Rate limiting disabled - Flask-Limiter not installed")
+            self.limiter = None
+            return
+
+        # Check if rate limiting is enabled
+        rate_limit_enabled = os.getenv('RATE_LIMIT_ENABLED', 'true').lower() == 'true'
+
+        if not rate_limit_enabled:
+            logger.warning("Rate limiting DISABLED via environment variable")
+            self.limiter = None
+            return
+
+        # Get rate limit configuration from environment
+        default_limit = os.getenv('RATE_LIMIT_DEFAULT', '100 per minute')
+        storage_uri = os.getenv('RATE_LIMIT_STORAGE', 'memory://')
+
+        # Initialize limiter
+        self.limiter = Limiter(
+            app=self.app,
+            key_func=get_remote_address,  # Rate limit by IP address
+            default_limits=[default_limit],
+            storage_uri=storage_uri,
+            strategy="fixed-window",  # Fixed time window strategy
+            headers_enabled=True,  # Include rate limit info in response headers
+        )
+
+        logger.info(f"Rate limiting enabled: {default_limit}")
+        logger.info(f"Storage backend: {storage_uri}")
+
     def _verify_api_key(self) -> bool:
         """
         Verify API key from request headers
@@ -256,9 +315,19 @@ class ClientBridge:
         return True, None
 
     def _register_routes(self):
-        """Register Flask routes"""
+        """Register Flask routes with rate limiting"""
+
+        # Helper to apply rate limiting decorator if limiter is available
+        def apply_rate_limit(limit_string):
+            """Apply rate limit decorator if limiter is available"""
+            def decorator(f):
+                if self.limiter:
+                    return self.limiter.limit(limit_string)(f)
+                return f
+            return decorator
 
         @self.app.route('/api/health', methods=['GET'])
+        @apply_rate_limit("30 per minute")  # Public endpoint - moderate limit
         def health_check():
             """Health check endpoint (public - no authentication required)"""
             uptime = (datetime.now() - self.start_time).total_seconds()
@@ -268,10 +337,12 @@ class ClientBridge:
                 "model": self.llm.default_model,
                 "uptime_seconds": uptime,
                 "request_count": self.request_count,
-                "auth_enabled": self.auth_enabled
+                "auth_enabled": self.auth_enabled,
+                "rate_limiting_enabled": self.limiter is not None
             })
 
         @self.app.route('/api/process', methods=['POST'])
+        @apply_rate_limit("10 per minute")  # LLM calls are expensive - strict limit
         @self.require_auth
         def process_request():
             """Process client request"""
@@ -379,6 +450,7 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/search', methods=['POST'])
+        @apply_rate_limit("30 per minute")  # Search operations - moderate limit
         @self.require_auth
         def search_library():
             """Search library (requires authentication)"""
@@ -445,6 +517,7 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/room/switch', methods=['POST'])
+        @apply_rate_limit("20 per minute")  # Room operations - moderate limit
         @self.require_auth
         def switch_room():
             """Switch room (requires authentication)"""
@@ -507,6 +580,7 @@ class ClientBridge:
                 }), 500
 
         @self.app.route('/api/rooms', methods=['GET'])
+        @apply_rate_limit("20 per minute")  # Room operations - moderate limit
         @self.require_auth
         def list_rooms():
             """List available rooms (requires authentication)"""
