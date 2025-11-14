@@ -45,7 +45,9 @@ class ClientBridge:
 
         # Create Flask app
         self.app = Flask(__name__)
-        CORS(self.app)  # Enable CORS for all routes
+
+        # Configure CORS with restricted origins (security)
+        self._configure_cors()
 
         # Register routes
         self._register_routes()
@@ -84,6 +86,87 @@ class ClientBridge:
         else:
             logger.info("API authentication enabled")
             self.auth_enabled = True
+
+    def _configure_cors(self):
+        """
+        Configure CORS with restricted origins for security
+
+        CORS is configured to only allow requests from:
+        - Local network (192.168.*)
+        - Localhost (127.0.0.1, localhost)
+        - Tailscale network (100.64.* to 100.127.*)
+        - Additional origins from CORS_ALLOWED_ORIGINS env variable
+
+        This prevents unauthorized cross-origin requests while allowing
+        legitimate clients to connect.
+        """
+        import re
+
+        # Default allowed origins (regex patterns)
+        allowed_origin_patterns = [
+            r'^https?://localhost(:[0-9]+)?$',           # localhost
+            r'^https?://127\.0\.0\.1(:[0-9]+)?$',        # 127.0.0.1
+            r'^https?://192\.168\.[0-9]+\.[0-9]+(:[0-9]+)?$',  # Local network 192.168.*
+            r'^https?://10\.[0-9]+\.[0-9]+\.[0-9]+(:[0-9]+)?$', # Local network 10.*
+            r'^https?://172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+(:[0-9]+)?$', # Local 172.16-31.*
+            r'^https?://100\.(6[4-9]|[7-9][0-9]|1[0-1][0-9]|12[0-7])\.[0-9]+\.[0-9]+(:[0-9]+)?$', # Tailscale 100.64-127.*
+        ]
+
+        # Load additional allowed origins from environment
+        custom_origins = os.getenv('CORS_ALLOWED_ORIGINS', '')
+        if custom_origins:
+            # Split by comma and add to patterns
+            for origin in custom_origins.split(','):
+                origin = origin.strip()
+                if origin:
+                    # Escape special regex characters except * which we'll replace
+                    escaped = re.escape(origin).replace(r'\*', '.*')
+                    allowed_origin_patterns.append(f'^{escaped}$')
+                    logger.info(f"Added custom CORS origin pattern: {origin}")
+
+        # Compile patterns
+        self.cors_patterns = [re.compile(pattern) for pattern in allowed_origin_patterns]
+
+        # Configure CORS with origin validation
+        CORS(
+            self.app,
+            resources={
+                r"/api/*": {
+                    "origins": self._validate_cors_origin,
+                    "methods": ["GET", "POST", "OPTIONS"],
+                    "allow_headers": ["Content-Type", "X-API-Key"],
+                    "expose_headers": ["Content-Type"],
+                    "supports_credentials": False,
+                    "max_age": 3600  # Cache preflight for 1 hour
+                }
+            }
+        )
+
+        logger.info(f"CORS configured with {len(self.cors_patterns)} allowed origin patterns")
+        logger.info("Allowed networks: localhost, 192.168.*, 10.*, 172.16-31.*, Tailscale")
+
+    def _validate_cors_origin(self, origin):
+        """
+        Validate if origin is allowed based on patterns
+
+        Args:
+            origin: Origin header from request
+
+        Returns:
+            True if origin is allowed, False otherwise
+        """
+        if not origin:
+            return False
+
+        # Check against all patterns
+        for pattern in self.cors_patterns:
+            if pattern.match(origin):
+                logger.debug(f"CORS: Allowed origin {origin}")
+                return True
+
+        # Log rejected origins for security monitoring
+        logger.warning(f"CORS: Rejected origin {origin} from {request.remote_addr}")
+        return False
 
     def _verify_api_key(self) -> bool:
         """
