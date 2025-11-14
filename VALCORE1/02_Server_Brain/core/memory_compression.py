@@ -416,9 +416,65 @@ class MemoryCompressor:
 
     def _catchup_compression(self):
         """Run compression for any missed days"""
-        # Check if compression needed for previous days
         logger.info("Checking for missed compressions...")
 
-        # This would check last compression date and run for any missed days
-        # Placeholder for now
-        pass
+        try:
+            # Find the last compressed date
+            daily_path = self.library_path / "daily"
+
+            if not daily_path.exists():
+                logger.info("No daily directory - no catchup needed")
+                return
+
+            # Find all compressed files
+            compressed_files = list(daily_path.glob("*_compressed.json"))
+
+            if not compressed_files:
+                logger.info("No previous compressions found - starting fresh")
+                # Compress yesterday if we've never compressed before
+                yesterday = datetime.now() - timedelta(days=1)
+                self.compress_daily_summary(yesterday)
+                return
+
+            # Get the most recent compressed date
+            dates = []
+            for f in compressed_files:
+                try:
+                    # Extract date from filename like "2025-11-13_compressed.json"
+                    date_str = f.stem.replace('_compressed', '')
+                    date = datetime.strptime(date_str, '%Y-%m-%d')
+                    dates.append(date)
+                except ValueError:
+                    continue
+
+            if not dates:
+                logger.warning("Could not parse any compression dates")
+                return
+
+            last_compressed = max(dates)
+            yesterday = datetime.now() - timedelta(days=1)
+
+            # Calculate days to catch up
+            days_behind = (yesterday - last_compressed).days
+
+            if days_behind <= 0:
+                logger.info("Compression is up to date")
+                return
+
+            logger.info(f"Found {days_behind} days to catch up on compression")
+
+            # Compress each missing day
+            for i in range(1, days_behind + 1):
+                date_to_compress = last_compressed + timedelta(days=i)
+
+                # Don't compress today or future dates
+                if date_to_compress >= datetime.now():
+                    break
+
+                logger.info(f"Running catchup compression for {date_to_compress:%Y-%m-%d}")
+                self.compress_daily_summary(date_to_compress)
+
+            logger.info("Catchup compression complete")
+
+        except Exception as e:
+            logger.error(f"Error during catchup compression: {e}", exc_info=True)

@@ -30,13 +30,14 @@ except ImportError:
     RESEMBLYZER_AVAILABLE = False
     logging.warning("Resemblyzer not available - speaker verification disabled")
 
-# TTS - Kokoro (using sounddevice for playback)
+# TTS - Piper (using sounddevice for playback)
 try:
-    import onnxruntime as ort
-    KOKORO_AVAILABLE = True
+    from piper import PiperVoice
+    from piper.download import ensure_voice_exists, find_voice, get_voices
+    PIPER_AVAILABLE = True
 except ImportError:
-    KOKORO_AVAILABLE = False
-    logging.warning("ONNX Runtime not available - TTS disabled")
+    PIPER_AVAILABLE = False
+    logging.warning("Piper TTS not available - TTS disabled")
 
 import torch
 
@@ -107,24 +108,65 @@ class VALVoiceSystem:
         logger.info(f"STT model loaded: {model_size} on {device}")
 
     def _init_tts(self):
-        """Initialize Kokoro TTS"""
-        if not KOKORO_AVAILABLE:
-            logger.warning("TTS not available")
+        """Initialize Piper TTS"""
+        if not PIPER_AVAILABLE:
+            logger.warning("Piper TTS not available - speech synthesis disabled")
             self.tts_available = False
+            self.piper_voice = None
             return
 
-        # Kokoro TTS would be initialized here
-        # For now, using simple text-to-speech notification
-        self.tts_available = True
-        logger.info("TTS system ready (Kokoro placeholder)")
+        try:
+            # Get voice configuration
+            voice_name = self.config['tts'].get('voice', 'en_US-lessac-medium')
+            model_path = self.config['tts'].get('model_path')
+
+            if model_path and os.path.exists(model_path):
+                # Load from specified path
+                logger.info(f"Loading Piper voice from: {model_path}")
+                self.piper_voice = PiperVoice.load(model_path)
+            else:
+                # Download voice if needed
+                logger.info(f"Loading Piper voice: {voice_name}")
+                voices_info = get_voices(self.config['tts'].get('download_dir', 'models/piper'), update_voices=True)
+
+                if voice_name in voices_info:
+                    ensure_voice_exists(voice_name, self.config['tts'].get('download_dir', 'models/piper'), voices_info)
+                    voice_info = find_voice(voice_name, self.config['tts'].get('download_dir', 'models/piper'))
+                    self.piper_voice = PiperVoice.load(voice_info['model_path'], config_path=voice_info.get('config_path'))
+                else:
+                    logger.warning(f"Voice '{voice_name}' not found, using default")
+                    # Fallback to a default voice
+                    default_voice = list(voices_info.keys())[0] if voices_info else None
+                    if default_voice:
+                        ensure_voice_exists(default_voice, self.config['tts'].get('download_dir', 'models/piper'), voices_info)
+                        voice_info = find_voice(default_voice, self.config['tts'].get('download_dir', 'models/piper'))
+                        self.piper_voice = PiperVoice.load(voice_info['model_path'], config_path=voice_info.get('config_path'))
+                    else:
+                        raise Exception("No Piper voices available")
+
+            self.tts_available = True
+            self.tts_sample_rate = self.config['tts'].get('sample_rate', 22050)
+            logger.info(f"Piper TTS initialized successfully (sample rate: {self.tts_sample_rate}Hz)")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize Piper TTS: {e}")
+            self.tts_available = False
+            self.piper_voice = None
 
     def _init_wake_word(self):
         """Initialize Porcupine wake word detection"""
         try:
+            # Check if wake word is enabled in config
+            if not self.config['wake_word'].get('enabled', True):
+                logger.info("Wake word disabled in configuration - using always-on mode")
+                self.wake_word_available = False
+                self.porcupine = None
+                return
+
             access_key = self.config['wake_word'].get('access_key', '')
 
             if not access_key or access_key == 'YOUR_PICOVOICE_ACCESS_KEY_HERE':
-                logger.warning("Porcupine access key not configured - wake word disabled")
+                logger.warning("Porcupine access key not configured - wake word disabled, using always-on mode")
                 self.wake_word_available = False
                 self.porcupine = None
                 return
@@ -232,28 +274,53 @@ class VALVoiceSystem:
             logger.error(f"Transcription error: {e}")
             return ""
 
-    def synthesize_speech(self, text: str) -> Optional[np.ndarray]:
+    def synthesize_speech(self, text: str, play_audio: bool = True) -> Optional[np.ndarray]:
         """
-        Synthesize speech from text using Kokoro TTS
+        Synthesize speech from text using Piper TTS
 
         Args:
             text: Text to synthesize
+            play_audio: If True, play audio immediately. If False, just return audio data.
 
         Returns:
             Audio data as numpy array or None if TTS unavailable
         """
-        if not self.tts_available:
+        if not self.tts_available or not self.piper_voice:
             logger.warning(f"TTS not available, would speak: {text}")
             return None
 
         try:
-            # TODO: Implement Kokoro TTS synthesis
-            # For now, just log the text
-            logger.info(f"TTS: {text}")
-            return None
+            logger.info(f"TTS synthesizing: {text}")
+
+            # Synthesize audio using Piper
+            # Piper returns a generator of audio chunks
+            audio_chunks = []
+            for audio_chunk in self.piper_voice.synthesize_stream_raw(text):
+                audio_chunks.append(audio_chunk)
+
+            # Combine all chunks
+            if not audio_chunks:
+                logger.warning("No audio generated from Piper")
+                return None
+
+            audio_data = np.concatenate(audio_chunks)
+
+            # Convert to float32 for sounddevice playback (-1.0 to 1.0 range)
+            if audio_data.dtype == np.int16:
+                audio_float = audio_data.astype(np.float32) / 32768.0
+            else:
+                audio_float = audio_data.astype(np.float32)
+
+            # Play audio if requested
+            if play_audio:
+                sd.play(audio_float, samplerate=self.tts_sample_rate)
+                sd.wait()  # Wait for playback to finish
+                logger.info("TTS playback complete")
+
+            return audio_float
 
         except Exception as e:
-            logger.error(f"TTS error: {e}")
+            logger.error(f"TTS synthesis error: {e}")
             return None
 
     def verify_speaker(self, audio_data: np.ndarray, profile_name: str = "ben_voice") -> bool:

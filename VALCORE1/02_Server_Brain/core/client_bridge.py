@@ -236,6 +236,128 @@ class ClientBridge:
                     "status": "error"
                 }), 500
 
+        @self.app.route('/api/conversation/version', methods=['POST'])
+        def get_conversation_version():
+            """Get conversation version for conflict detection"""
+            try:
+                data = request.get_json()
+                conversation_id = data.get('conversation_id')
+
+                if not conversation_id:
+                    return jsonify({
+                        "error": "conversation_id required",
+                        "status": "error"
+                    }), 400
+
+                # Search librarian for conversation metadata
+                results = self.librarian.search(
+                    query=conversation_id,
+                    max_results=1
+                )
+
+                if results:
+                    version = results[0].get('metadata', {}).get('version', 1)
+                    timestamp = results[0].get('metadata', {}).get('timestamp')
+
+                    return jsonify({
+                        "conversation_id": conversation_id,
+                        "version": version,
+                        "timestamp": timestamp,
+                        "status": "ok"
+                    })
+                else:
+                    return jsonify({
+                        "conversation_id": conversation_id,
+                        "exists": False,
+                        "status": "ok"
+                    })
+
+            except Exception as e:
+                logger.error(f"Get conversation version error: {e}", exc_info=True)
+
+                return jsonify({
+                    "error": str(e),
+                    "status": "error"
+                }), 500
+
+        @self.app.route('/api/file/timestamp', methods=['POST'])
+        def get_file_timestamp():
+            """Get file timestamp for conflict detection"""
+            try:
+                data = request.get_json()
+                file_path = data.get('file_path')
+
+                if not file_path:
+                    return jsonify({
+                        "error": "file_path required",
+                        "status": "error"
+                    }), 400
+
+                # Check if file exists in librarian metadata
+                results = self.librarian.search(
+                    query=f"file:{file_path}",
+                    max_results=1
+                )
+
+                if results:
+                    timestamp = results[0].get('metadata', {}).get('timestamp')
+                    return jsonify({
+                        "file_path": file_path,
+                        "timestamp": timestamp,
+                        "exists": True,
+                        "status": "ok"
+                    })
+                else:
+                    return jsonify({
+                        "file_path": file_path,
+                        "exists": False,
+                        "status": "ok"
+                    })
+
+            except Exception as e:
+                logger.error(f"Get file timestamp error: {e}", exc_info=True)
+
+                return jsonify({
+                    "error": str(e),
+                    "status": "error"
+                }), 500
+
+        @self.app.route('/api/conversation/fetch', methods=['POST'])
+        def fetch_conversation():
+            """Fetch conversation data from server"""
+            try:
+                data = request.get_json()
+                conversation_id = data.get('conversation_id')
+                room = data.get('room')
+
+                if not conversation_id:
+                    return jsonify({
+                        "error": "conversation_id required",
+                        "status": "error"
+                    }), 400
+
+                # Search librarian for conversation
+                results = self.librarian.search(
+                    query=conversation_id,
+                    room=room,
+                    max_results=10
+                )
+
+                return jsonify({
+                    "conversation_id": conversation_id,
+                    "results": results,
+                    "count": len(results),
+                    "status": "ok"
+                })
+
+            except Exception as e:
+                logger.error(f"Fetch conversation error: {e}", exc_info=True)
+
+                return jsonify({
+                    "error": str(e),
+                    "status": "error"
+                }), 500
+
     def start_server(self, host: str = '0.0.0.0', port: int = 5000):
         """
         Start Flask server

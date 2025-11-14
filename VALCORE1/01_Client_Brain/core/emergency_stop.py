@@ -55,7 +55,16 @@ class EmergencyStop:
         Returns:
             List of pending commands
         """
-        # Placeholder - would integrate with actual command queue
+        try:
+            # Check if there's a command queue state file
+            queue_file = self.state_dir / "command_queue.json"
+            if queue_file.exists():
+                with open(queue_file, 'r') as f:
+                    queue_data = json.load(f)
+                return queue_data.get('pending', [])
+        except Exception as e:
+            logger.debug(f"Could not read command queue: {e}")
+
         return []
 
     def get_mic_state(self) -> str:
@@ -65,7 +74,17 @@ class EmergencyStop:
         Returns:
             "enabled" or "disabled"
         """
-        # Placeholder - would check actual voice system
+        try:
+            # Check voice system state file
+            voice_state_file = self.state_dir / "voice_state.json"
+            if voice_state_file.exists():
+                with open(voice_state_file, 'r') as f:
+                    state = json.load(f)
+                return state.get('microphone', 'enabled')
+        except Exception as e:
+            logger.debug(f"Could not read voice state: {e}")
+
+        # Default to enabled
         return "enabled"
 
     def save_checkpoint(self, reason: str = "emergency_stop"):

@@ -195,8 +195,24 @@ class NetworkFallbackManager:
         Returns:
             Version number or None
         """
-        # Placeholder - would query server
-        return None
+        try:
+            server_url = self.get_server_url()
+            response = requests.post(
+                f"{server_url}/api/conversation/version",
+                json={"conversation_id": conversation_id},
+                timeout=5
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('exists', True):
+                    return data.get('version')
+
+            return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching conversation version: {e}")
+            return None
 
     def _get_server_file_timestamp(self, file_path: str) -> Optional[str]:
         """
@@ -208,28 +224,104 @@ class NetworkFallbackManager:
         Returns:
             ISO timestamp or None
         """
-        # Placeholder - would query server
-        return None
+        try:
+            server_url = self.get_server_url()
+            response = requests.post(
+                f"{server_url}/api/file/timestamp",
+                json={"file_path": file_path},
+                timeout=5
+            )
 
-    def _fetch_from_server(self, message: Dict):
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('exists', False):
+                    return data.get('timestamp')
+
+            return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching file timestamp: {e}")
+            return None
+
+    def _fetch_from_server(self, message: Dict) -> Optional[Dict]:
         """
         Fetch latest version from server
 
         Args:
             message: Message with reference info
-        """
-        # Placeholder - would fetch from server
-        pass
 
-    def _merge_changes(self, message: Dict):
+        Returns:
+            Server data or None if fetch failed
+        """
+        try:
+            message_type = message.get('type')
+
+            if message_type == 'conversation':
+                conversation_id = message.get('conversation_id')
+                room = message.get('room')
+
+                server_url = self.get_server_url()
+                response = requests.post(
+                    f"{server_url}/api/conversation/fetch",
+                    json={
+                        "conversation_id": conversation_id,
+                        "room": room
+                    },
+                    timeout=10
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    logger.info(f"Fetched {data.get('count', 0)} items from server")
+                    return data
+
+            return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching from server: {e}")
+            return None
+
+    def _merge_changes(self, message: Dict) -> bool:
         """
         Attempt automatic merge of changes
 
         Args:
             message: Message with changes
+
+        Returns:
+            True if merge successful, False otherwise
         """
-        # Placeholder - would implement merge logic
-        pass
+        try:
+            # Fetch server version
+            server_data = self._fetch_from_server(message)
+
+            if not server_data:
+                logger.error("Cannot merge - failed to fetch server data")
+                return False
+
+            message_type = message.get('type')
+
+            if message_type == 'conversation':
+                # For conversations, we can append local changes to server version
+                # This is a simple "last write wins" with chronological merge
+                logger.info("Merging conversation changes...")
+
+                # In a real implementation, you would:
+                # 1. Compare timestamps
+                # 2. Merge non-conflicting changes
+                # 3. Flag conflicting changes for manual review
+
+                # For now, log the conflict and recommend manual review
+                logger.warning("Automatic merge not yet fully implemented - manual review recommended")
+                return False
+
+            else:
+                logger.warning(f"Merge not supported for message type: {message_type}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error during merge: {e}")
+            return False
 
     def resolve_conflict(self, conflict: Dict, resolution: str = "keep_local"):
         """

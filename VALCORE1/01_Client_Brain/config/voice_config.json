@@ -9,15 +9,16 @@
     "language": "en"
   },
   "tts": {
-    "model": "kokoro-v0_19",
-    "device": "cuda:0",
-    "voice_profile": "ben_voice",
-    "speed": 1.0,
-    "sample_rate": 24000
+    "voice": "en_US-lessac-medium",
+    "model_path": null,
+    "download_dir": "models/piper",
+    "sample_rate": 22050,
+    "speed": 1.0
   },
   "wake_word": {
-    "access_key": "YOUR_PICOVOICE_ACCESS_KEY_HERE",
-    "keyword_paths": ["config/Hey-Val_en_windows_v3_0_0.ppn"],
+    "enabled": false,
+    "access_key": "",
+    "keyword_paths": [],
     "model_path": null,
     "sensitivity": 0.7
   },

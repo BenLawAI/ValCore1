@@ -44,10 +44,10 @@ sounddevice>=0.4.6
 soundfile>=0.12.0
 pyaudio>=0.2.13  # Alternative audio backend
 
-# Text-to-Speech (Kokoro placeholder - install separately)
-# TTS>=0.13.0  # Optional: Coqui TTS as alternative
+# Text-to-Speech - Piper TTS (Local, Fast, High Quality)
+piper-tts>=1.2.0
 
-# Wake Word Detection
+# Wake Word Detection (Optional - disabled by default)
 # pvporcupine>=2.2.0  # Requires Picovoice access key
 
 # Speaker Verification
