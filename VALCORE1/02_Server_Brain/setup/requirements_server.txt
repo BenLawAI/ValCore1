@@ -21,3 +21,10 @@ flask-cors>=5.0.0
 python-dotenv>=1.0.1
 pydantic>=2.9.2
 numpy>=1.26.4
+
+# Testing (optional but recommended)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
+pytest-timeout>=2.1.0
+pytest-xdist>=3.3.1
