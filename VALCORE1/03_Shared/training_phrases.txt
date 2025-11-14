@@ -1,0 +1,113 @@
+# VALCORE1 Voice Training Phrases
+# Read these aloud during voice profile generation
+# Covers English phonetic range and common commands
+
+# System Commands (20 phrases)
+Hey Val mic on
+Hey Val mic off
+Switch to truck room
+Switch to invoice room
+Switch to legal room
+What room am I in
+Show me my calendar
+Take a screenshot
+Type this into the active window
+Undo last command
+What time is it
+Open Chrome browser
+Close this window
+Search my Drive for invoices
+Read my latest email
+Schedule a meeting tomorrow
+What's the weather today
+Summarize this document
+Create a new file
+Stop listening
+
+# Phonetic Coverage (30 phrases)
+The quick brown fox jumps over the lazy dog
+Pack my box with five dozen liquor jugs
+How vexingly quick daft zebras jump
+Bright blue birds fly above the green grassy hills
+She sells seashells by the seashore surely
+Peter Piper picked a peck of pickled peppers
+Can you can a can as a canner can can a can
+Fuzzy Wuzzy was a bear Fuzzy Wuzzy had no hair
+Toy boat toy boat toy boat
+Red lorry yellow lorry red lorry yellow lorry
+Irish wristwatch Swiss wristwatch
+Unique New York unique New York
+Specific Pacific specific Pacific
+Three free throws three free throws
+Eleven benevolent elephants eleven benevolent elephants
+She sees cheese she sees cheese
+Flash message flash message
+Which witch is which which witch is which
+Six thick thistle sticks six thick thistle sticks
+Lesser leather never weathered wetter weather better
+I scream you scream we all scream for ice cream
+How much wood would a woodchuck chuck
+A big black bug bit a big black bear
+Betty bought butter but the butter was bitter
+Round the rugged rocks the ragged rascal ran
+Six slippery snails slid slowly seaward
+The sixth sick sheik's sixth sheep's sick
+Fred fed Ted bread and Ted fed Fred bread
+Gobbling gargoyles gobbled gobbling goblins
+Imagine an imaginary menagerie manager
+
+# Numbers (10 phrases)
+One two three four five six seven eight nine ten
+Twenty thirty forty fifty sixty seventy eighty ninety
+One hundred one thousand ten thousand
+The year is twenty twenty-five
+My phone number is area code five five five
+Invoice number zero zero zero one
+The cost is ninety-nine dollars and ninety-nine cents
+Pi equals three point one four one five nine
+My address is twelve thirty-four Main Street
+The time is three forty-five PM
+
+# Technical Terms (20 phrases)
+Initialize the GPU acceleration module
+Configure CUDA compute capability version twelve
+Run the Python virtual environment activation script
+Execute the backup and restore procedure now
+Authenticate with OAuth two point zero credentials
+Deploy the containerized microservices architecture
+Synchronize the vector embeddings database index
+Compile the TypeScript source files to JavaScript
+Query the SQL database with parameterized statements
+Establish a secure WebSocket connection to the server
+Parse the JSON response payload from the API
+Validate the XML schema against the DTD specification
+Encrypt the data using AES two fifty-six bit algorithm
+Implement the RESTful API endpoint handlers
+Cache the results in Redis with TTL expiration
+Load balance the requests across multiple instances
+Monitor the system metrics and performance counters
+Optimize the database query execution plan
+Refactor the legacy codebase to modern standards
+Debug the segmentation fault in the memory allocator
+
+# Conversational (20 phrases)
+Good morning how are you doing today
+I need help with something can you assist me
+That sounds great let's do it that way
+Actually I changed my mind let's try something else
+Hold on a second I need to think about this
+Honestly I'm not sure what the best approach is
+Could you explain that again more slowly please
+Interesting I hadn't thought about it like that
+Absolutely that makes perfect sense to me now
+Unfortunately that didn't work as expected
+Seriously what were they thinking with that design
+Obviously we need a better solution than this
+Basically what I'm trying to say is this
+Specifically I want to focus on the details here
+Generally speaking that approach works well enough
+Technically you're correct but practically it's difficult
+Realistically we need to consider the constraints
+Apparently there's been some confusion about this
+Surprisingly the results were better than expected
+Hopefully this will resolve the issue permanently
