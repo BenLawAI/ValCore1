@@ -195,8 +195,29 @@ class NetworkFallbackManager:
         Returns:
             Version number or None
         """
-        # Placeholder - would query server
-        return None
+        if not conversation_id:
+            return None
+
+        try:
+            server_url = self.get_server_url()
+            response = requests.get(
+                f"{server_url}/api/conversation/{conversation_id}/version",
+                timeout=5
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('version')
+            elif response.status_code == 404:
+                # Conversation doesn't exist on server yet
+                return None
+            else:
+                logger.warning(f"Failed to get conversation version: {response.status_code}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error querying server for conversation version: {e}")
+            return None
 
     def _get_server_file_timestamp(self, file_path: str) -> Optional[str]:
         """
@@ -208,51 +229,182 @@ class NetworkFallbackManager:
         Returns:
             ISO timestamp or None
         """
-        # Placeholder - would query server
-        return None
+        if not file_path:
+            return None
 
-    def _fetch_from_server(self, message: Dict):
+        try:
+            server_url = self.get_server_url()
+            response = requests.get(
+                f"{server_url}/api/file/timestamp",
+                params={'path': file_path},
+                timeout=5
+            )
+
+            if response.status_code == 200:
+                data = response.json()
+                return data.get('timestamp')
+            elif response.status_code == 404:
+                # File doesn't exist on server
+                return None
+            else:
+                logger.warning(f"Failed to get file timestamp: {response.status_code}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error querying server for file timestamp: {e}")
+            return None
+
+    def _fetch_from_server(self, message: Dict) -> Optional[Dict]:
         """
         Fetch latest version from server
 
         Args:
             message: Message with reference info
-        """
-        # Placeholder - would fetch from server
-        pass
 
-    def _merge_changes(self, message: Dict):
+        Returns:
+            Server version of the message, or None if fetch failed
+        """
+        message_type = message.get('type')
+
+        try:
+            server_url = self.get_server_url()
+
+            if message_type == 'conversation':
+                conversation_id = message.get('conversation_id')
+                response = requests.get(
+                    f"{server_url}/api/conversation/{conversation_id}",
+                    timeout=5
+                )
+
+                if response.status_code == 200:
+                    server_data = response.json()
+                    logger.info(f"Fetched conversation {conversation_id} from server")
+                    return server_data
+
+            elif message_type == 'file_edit':
+                file_path = message.get('file_path')
+                response = requests.get(
+                    f"{server_url}/api/file",
+                    params={'path': file_path},
+                    timeout=5
+                )
+
+                if response.status_code == 200:
+                    server_data = response.json()
+                    logger.info(f"Fetched file {file_path} from server")
+                    return server_data
+
+            logger.warning(f"Failed to fetch from server: {response.status_code}")
+            return None
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching from server: {e}")
+            return None
+
+    def _merge_changes(self, message: Dict) -> bool:
         """
         Attempt automatic merge of changes
 
         Args:
             message: Message with changes
-        """
-        # Placeholder - would implement merge logic
-        pass
 
-    def resolve_conflict(self, conflict: Dict, resolution: str = "keep_local"):
+        Returns:
+            True if merge successful, False otherwise
+        """
+        message_type = message.get('type')
+
+        # Fetch server version
+        server_version = self._fetch_from_server(message)
+        if not server_version:
+            logger.error("Cannot merge: failed to fetch server version")
+            return False
+
+        try:
+            if message_type == 'conversation':
+                # Merge conversation messages
+                local_messages = message.get('messages', [])
+                server_messages = server_version.get('messages', [])
+
+                # Simple merge: combine and deduplicate by timestamp
+                all_messages = local_messages + server_messages
+                seen_timestamps = set()
+                merged_messages = []
+
+                for msg in sorted(all_messages, key=lambda x: x.get('timestamp', '')):
+                    timestamp = msg.get('timestamp')
+                    if timestamp and timestamp not in seen_timestamps:
+                        merged_messages.append(msg)
+                        seen_timestamps.add(timestamp)
+
+                # Create merged message
+                merged = message.copy()
+                merged['messages'] = merged_messages
+                merged['version'] = max(
+                    message.get('version', 0),
+                    server_version.get('version', 0)
+                ) + 1
+
+                # Send merged version to server
+                response = self.send_to_server(merged)
+                if response:
+                    logger.info("Merge successful: conversation merged")
+                    return True
+
+            elif message_type == 'file_edit':
+                # For file edits, we can't automatically merge
+                # This requires manual resolution
+                logger.warning("Cannot auto-merge file edits - requires manual resolution")
+                return False
+
+            return False
+
+        except Exception as e:
+            logger.error(f"Error during merge: {e}")
+            return False
+
+    def resolve_conflict(self, conflict: Dict, resolution: str = "keep_local") -> bool:
         """
         Resolve conflict manually
 
         Args:
             conflict: Conflict from conflict_log
             resolution: "keep_local", "keep_server", or "merge"
+
+        Returns:
+            True if resolution successful, False otherwise
         """
         if resolution == "keep_local":
             # Force send local version to server
-            self.send_to_server(conflict['message'])
-            logger.info("Conflict resolved: keeping local version")
+            response = self.send_to_server(conflict['message'])
+            if response:
+                logger.info("Conflict resolved: keeping local version")
+                return True
+            else:
+                logger.error("Failed to resolve conflict: server unreachable")
+                return False
 
         elif resolution == "keep_server":
             # Discard local changes, fetch server version
-            self._fetch_from_server(conflict['message'])
-            logger.info("Conflict resolved: keeping server version")
+            server_data = self._fetch_from_server(conflict['message'])
+            if server_data:
+                logger.info("Conflict resolved: keeping server version")
+                return True
+            else:
+                logger.error("Failed to resolve conflict: could not fetch server version")
+                return False
 
         elif resolution == "merge":
             # Attempt automatic merge
-            self._merge_changes(conflict['message'])
-            logger.info("Conflict resolved: attempting merge")
+            success = self._merge_changes(conflict['message'])
+            if success:
+                logger.info("Conflict resolved: merge successful")
+            else:
+                logger.error("Conflict resolution failed: merge unsuccessful")
+            return success
+
+        else:
+            logger.error(f"Invalid resolution strategy: {resolution}")
+            return False
 
     def _save_conflict_log(self):
         """Save conflict log to disk"""

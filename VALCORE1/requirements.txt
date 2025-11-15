@@ -44,8 +44,10 @@ sounddevice>=0.4.6
 soundfile>=0.12.0
 pyaudio>=0.2.13  # Alternative audio backend
 
-# Text-to-Speech (Kokoro placeholder - install separately)
+# Text-to-Speech
+pyttsx3>=2.90  # Primary TTS engine (offline, cross-platform)
 # TTS>=0.13.0  # Optional: Coqui TTS as alternative
+# kokoro-onnx>=0.1.1  # Optional: Future TTS backend (not yet released)
 
 # Wake Word Detection
 # pvporcupine>=2.2.0  # Requires Picovoice access key

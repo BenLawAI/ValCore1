@@ -3,7 +3,8 @@
 faster-whisper==1.0.3
 ctranslate2>=4.3.1
 pyav>=12.3.0
-kokoro-onnx>=0.1.1
+pyttsx3>=2.90  # Primary TTS engine (offline, cross-platform)
+kokoro-onnx>=0.1.1  # Optional: Future TTS backend
 onnxruntime-gpu>=1.18.0
 pvporcupine==3.0.2
 resemblyzer>=0.1.1.dev0

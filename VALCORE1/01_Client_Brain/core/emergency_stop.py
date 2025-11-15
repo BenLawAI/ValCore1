@@ -20,11 +20,21 @@ STATE_DIR = Path("A:/000_START_HERE/VALCORE1_ROOT/Systems/VALCORE1/.state")
 class EmergencyStop:
     """Emergency shutdown system with state preservation"""
 
-    def __init__(self):
-        """Initialize emergency stop system"""
+    def __init__(self, voice_system=None, command_queue=None):
+        """
+        Initialize emergency stop system
+
+        Args:
+            voice_system: Reference to VALVoiceSystem instance (optional)
+            command_queue: Reference to command queue object (optional)
+        """
         self.enabled = True
         self.state_dir = Path(".state")  # Relative to current directory
         self.state_dir.mkdir(exist_ok=True)
+
+        # Store references to system components
+        self.voice_system = voice_system
+        self.command_queue = command_queue
 
         # Register hotkey
         try:
@@ -55,7 +65,21 @@ class EmergencyStop:
         Returns:
             List of pending commands
         """
-        # Placeholder - would integrate with actual command queue
+        if self.command_queue is not None:
+            try:
+                # If command_queue is a Queue object
+                if hasattr(self.command_queue, 'qsize'):
+                    queue_size = self.command_queue.qsize()
+                    # Don't drain the queue, just report size
+                    return [f"<{queue_size} pending commands>"]
+                # If command_queue is a list or dict
+                elif isinstance(self.command_queue, (list, dict)):
+                    return list(self.command_queue)
+                else:
+                    return []
+            except Exception as e:
+                logger.error(f"Error getting command queue: {e}")
+                return []
         return []
 
     def get_mic_state(self) -> str:
@@ -65,8 +89,18 @@ class EmergencyStop:
         Returns:
             "enabled" or "disabled"
         """
-        # Placeholder - would check actual voice system
-        return "enabled"
+        if self.voice_system is not None:
+            try:
+                # Check if voice system has microphone_enabled attribute
+                if hasattr(self.voice_system, 'microphone_enabled'):
+                    return "enabled" if self.voice_system.microphone_enabled else "disabled"
+                # Check if voice system is running
+                elif hasattr(self.voice_system, 'running'):
+                    return "enabled" if self.voice_system.running else "disabled"
+            except Exception as e:
+                logger.error(f"Error getting mic state: {e}")
+                return "unknown"
+        return "unknown"
 
     def save_checkpoint(self, reason: str = "emergency_stop"):
         """
@@ -146,6 +180,18 @@ class EmergencyStop:
         # Save state
         print("Saving checkpoint...")
         self.save_checkpoint("panic_hotkey")
+
+        # Stop voice system if available
+        if self.voice_system is not None:
+            try:
+                print("Stopping voice system...")
+                if hasattr(self.voice_system, 'stop_listening'):
+                    self.voice_system.stop_listening()
+                if hasattr(self.voice_system, 'cleanup'):
+                    self.voice_system.cleanup()
+                print("✓ Voice system stopped")
+            except Exception as e:
+                logger.error(f"Error stopping voice system: {e}")
 
         # Kill processes
         print("Terminating VALCORE1 processes...")
