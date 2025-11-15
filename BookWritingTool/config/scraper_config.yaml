@@ -1,0 +1,39 @@
+# Bestseller Scraper Configuration
+
+amazon:
+  urls:
+    overall: "https://www.amazon.com/best-sellers-books-Amazon/zgbs/books/"
+    thriller: "https://www.amazon.com/Best-Sellers-Books-Thrillers/zgbs/books/16190/"
+    fantasy: "https://www.amazon.com/Best-Sellers-Books-Fantasy/zgbs/books/16190/"
+    scifi: "https://www.amazon.com/Best-Sellers-Books-Science-Fiction/zgbs/books/16272/"
+    romance: "https://www.amazon.com/Best-Sellers-Kindle-Store-Romance/zgbs/digital-text/154606011/"
+
+  selectors:
+    item: "div[id^='gridItemRoot']"
+    title: "div._cDEzb_p13n-sc-css-line-clamp-3_g3dy1"
+    author: "a.a-size-base"
+
+nyt:
+  urls:
+    fiction: "https://www.nytimes.com/books/best-sellers/combined-print-and-e-book-fiction/"
+    nonfiction: "https://www.nytimes.com/books/best-sellers/combined-print-and-e-book-nonfiction/"
+
+  selectors:
+    item: "li[class*='css-']"
+    title: "h3"
+    author: "p[class*='author']"
+
+usatoday:
+  url: "https://www.usatoday.com/entertainment/books/best-selling/"
+
+  selectors:
+    item: "div.book-list-item"
+    title: ".book-title"
+    author: ".book-author"
+
+scraping:
+  delay_min: 2  # seconds
+  delay_max: 5  # seconds
+  retry_attempts: 3
+  timeout: 30000  # milliseconds
+  top_n: 20  # Number of books to scrape per list

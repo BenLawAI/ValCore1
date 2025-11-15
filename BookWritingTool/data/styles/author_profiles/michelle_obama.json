@@ -1,0 +1,34 @@
+{
+  "name": "Michelle Obama",
+  "genre": "Memoir/Autobiography",
+  "style": {
+    "tone": "light",
+    "formality": "balanced",
+    "sentence_length": "medium",
+    "avg_sentence_words": 18
+  },
+  "voice": {
+    "pov_preference": "1st person",
+    "narrative_style": "Warm, reflective, intimate memoir voice",
+    "dialogue_ratio": 0.25
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 7.0
+  },
+  "signature": {
+    "techniques": [
+      "Reflective introspection",
+      "Detailed sensory memories",
+      "Honest vulnerability",
+      "Inspirational without preaching"
+    ],
+    "common_themes": [
+      "Personal growth and identity",
+      "Family and community",
+      "Overcoming obstacles",
+      "Finding your voice"
+    ]
+  },
+  "style_descriptor": "Michelle Obama's warm memoir voice with reflective honesty, intimate personal storytelling, inspirational without being preachy"
+}

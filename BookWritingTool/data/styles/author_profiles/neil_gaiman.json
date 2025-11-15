@@ -1,0 +1,34 @@
+{
+  "name": "Neil Gaiman",
+  "genre": "Fantasy/Mythology",
+  "style": {
+    "tone": "balanced",
+    "formality": "balanced",
+    "sentence_length": "medium",
+    "avg_sentence_words": 16
+  },
+  "voice": {
+    "pov_preference": "Varied (3rd person, 1st person)",
+    "narrative_style": "Lyrical storytelling with fairy tale quality and dry wit",
+    "dialogue_ratio": 0.4
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 7.5
+  },
+  "signature": {
+    "techniques": [
+      "Fairy tale narrative framing",
+      "Mythology blended with modern world",
+      "Dry British humor",
+      "Lyrical descriptive passages"
+    ],
+    "common_themes": [
+      "Stories and belief create reality",
+      "Old gods in new world",
+      "Coming of age through strange journeys",
+      "Death personified as character"
+    ]
+  },
+  "style_descriptor": "Neil Gaiman's lyrical fantasy blending mythology with modern world, fairy tale narrative quality, whimsical yet profound"
+}

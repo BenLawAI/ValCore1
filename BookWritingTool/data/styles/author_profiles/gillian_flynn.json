@@ -1,0 +1,34 @@
+{
+  "name": "Gillian Flynn",
+  "genre": "Psychological Thriller",
+  "style": {
+    "tone": "dark",
+    "formality": "balanced",
+    "sentence_length": "medium",
+    "avg_sentence_words": 17
+  },
+  "voice": {
+    "pov_preference": "1st person (unreliable narrator)",
+    "narrative_style": "Dark psychological depth, twisted internal monologue",
+    "dialogue_ratio": 0.35
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 7.5
+  },
+  "signature": {
+    "techniques": [
+      "Unreliable narrators",
+      "Dark humor",
+      "Morally complex characters",
+      "Plot twists that recontextualize everything"
+    ],
+    "common_themes": [
+      "Marriage and relationships as battlegrounds",
+      "Female rage and manipulation",
+      "Appearance vs reality",
+      "Sociopathy and narcissism"
+    ]
+  },
+  "style_descriptor": "Gillian Flynn's psychological thriller with unreliable narrators, dark twisted internal monologue, morally complex characters"
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Lee Child",
+  "genre": "Action Thriller",
+  "style": {
+    "tone": "neutral",
+    "formality": "casual",
+    "sentence_length": "short",
+    "avg_sentence_words": 10
+  },
+  "voice": {
+    "pov_preference": "3rd person limited",
+    "narrative_style": "Clipped, present-tense action with minimal description",
+    "dialogue_ratio": 0.3
+  },
+  "vocabulary": {
+    "complexity": "simple",
+    "reading_level": 5.0
+  },
+  "signature": {
+    "techniques": [
+      "Short punchy sentences",
+      "Present tense narration",
+      "Extreme economy of words",
+      "Action over introspection"
+    ],
+    "common_themes": [
+      "Lone wolf justice",
+      "Minimal possessions, maximum skills",
+      "Conspiracy unraveling",
+      "Underdog vs system"
+    ]
+  },
+  "style_descriptor": "Lee Child's terse thriller style with short punchy sentences, present-tense immediacy, action-driven sparse prose"
+}

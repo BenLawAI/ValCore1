@@ -1,0 +1,34 @@
+{
+  "name": "Stephen King",
+  "genre": "Horror/Thriller",
+  "style": {
+    "tone": "dark",
+    "formality": "casual",
+    "sentence_length": "medium",
+    "avg_sentence_words": 18
+  },
+  "voice": {
+    "pov_preference": "3rd person limited",
+    "narrative_style": "Accessible horror with everyday settings",
+    "dialogue_ratio": 0.4
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 6.0
+  },
+  "signature": {
+    "techniques": [
+      "Slow-building dread",
+      "Detailed character backstories",
+      "Small-town American settings",
+      "Supernatural with grounded realism"
+    ],
+    "common_themes": [
+      "Good vs evil",
+      "Childhood trauma",
+      "Small communities under threat",
+      "Power of friendship"
+    ]
+  },
+  "style_descriptor": "Stephen King's accessible horror with slow-building tension, everyday characters facing extraordinary evil, conversational prose"
+}

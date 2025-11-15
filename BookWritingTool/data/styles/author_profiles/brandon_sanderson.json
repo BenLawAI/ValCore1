@@ -1,0 +1,34 @@
+{
+  "name": "Brandon Sanderson",
+  "genre": "Epic Fantasy",
+  "style": {
+    "tone": "balanced",
+    "formality": "balanced",
+    "sentence_length": "medium",
+    "avg_sentence_words": 20
+  },
+  "voice": {
+    "pov_preference": "3rd person limited (multiple POV)",
+    "narrative_style": "Detailed world-building with clear magic system explanations",
+    "dialogue_ratio": 0.35
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 7.0
+  },
+  "signature": {
+    "techniques": [
+      "Hard magic systems with clear rules",
+      "Intricate plotting with payoffs",
+      "Multiple POV structure",
+      "Action sequences with clear choreography"
+    ],
+    "common_themes": [
+      "Trust and betrayal",
+      "Cost of power",
+      "Redemption arcs",
+      "Systematic world-building"
+    ]
+  },
+  "style_descriptor": "Brandon Sanderson's epic fantasy with detailed magic systems, intricate plotting, clear prose explaining complex worlds"
+}

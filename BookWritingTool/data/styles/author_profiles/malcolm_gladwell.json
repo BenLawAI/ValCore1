@@ -1,0 +1,34 @@
+{
+  "name": "Malcolm Gladwell",
+  "genre": "Business/Non-fiction",
+  "style": {
+    "tone": "light",
+    "formality": "balanced",
+    "sentence_length": "medium",
+    "avg_sentence_words": 19
+  },
+  "voice": {
+    "pov_preference": "3rd person (storytelling mode)",
+    "narrative_style": "Anecdotal storytelling to illustrate complex ideas",
+    "dialogue_ratio": 0.1
+  },
+  "vocabulary": {
+    "complexity": "moderate",
+    "reading_level": 8.0
+  },
+  "signature": {
+    "techniques": [
+      "Opening with surprising anecdote",
+      "Making counterintuitive claims",
+      "Connecting disparate ideas",
+      "Using stories to explain research"
+    ],
+    "common_themes": [
+      "Hidden patterns in human behavior",
+      "Counterintuitive insights",
+      "Power of context",
+      "Small things that make big differences"
+    ]
+  },
+  "style_descriptor": "Malcolm Gladwell's narrative non-fiction using compelling anecdotes to illustrate research, making complex ideas accessible and surprising"
+}

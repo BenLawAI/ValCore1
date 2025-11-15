@@ -1,0 +1,34 @@
+{
+  "name": "Rick Riordan",
+  "genre": "YA Fantasy/Adventure",
+  "style": {
+    "tone": "light",
+    "formality": "casual",
+    "sentence_length": "short",
+    "avg_sentence_words": 12
+  },
+  "voice": {
+    "pov_preference": "1st person",
+    "narrative_style": "Fast-paced, humorous, teen voice with pop culture references",
+    "dialogue_ratio": 0.5
+  },
+  "vocabulary": {
+    "complexity": "simple",
+    "reading_level": 5.5
+  },
+  "signature": {
+    "techniques": [
+      "Chapter-ending cliffhangers",
+      "Witty internal monologue",
+      "Sarcastic humor in danger",
+      "Modern teens meet mythology"
+    ],
+    "common_themes": [
+      "Chosen one reluctant hero",
+      "Found family",
+      "Identity and belonging",
+      "Ancient myths in modern world"
+    ]
+  },
+  "style_descriptor": "Rick Riordan's fast-paced YA adventure with witty first-person narration, pop culture humor, and mythology-meets-modern-world"
+}

@@ -1,0 +1,34 @@
+{
+  "name": "James Clear",
+  "genre": "Self-Help/Business",
+  "style": {
+    "tone": "neutral",
+    "formality": "casual",
+    "sentence_length": "short",
+    "avg_sentence_words": 14
+  },
+  "voice": {
+    "pov_preference": "2nd person (instructional)",
+    "narrative_style": "Clear, practical, example-driven instruction",
+    "dialogue_ratio": 0.05
+  },
+  "vocabulary": {
+    "complexity": "simple",
+    "reading_level": 6.5
+  },
+  "signature": {
+    "techniques": [
+      "Concrete examples before principles",
+      "Clear numbered frameworks",
+      "Actionable takeaways",
+      "Scientific research cited accessibly"
+    ],
+    "common_themes": [
+      "Small changes compound over time",
+      "Systems over goals",
+      "Identity-based habits",
+      "Environment shapes behavior"
+    ]
+  },
+  "style_descriptor": "James Clear's practical self-help with concrete examples, clear frameworks, actionable advice in accessible prose"
+}

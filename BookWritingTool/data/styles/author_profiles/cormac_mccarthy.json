@@ -1,0 +1,35 @@
+{
+  "name": "Cormac McCarthy",
+  "genre": "Literary Fiction",
+  "style": {
+    "tone": "dark",
+    "formality": "formal",
+    "sentence_length": "long",
+    "avg_sentence_words": 25
+  },
+  "voice": {
+    "pov_preference": "3rd person omniscient",
+    "narrative_style": "Sparse, poetic, biblical cadence with minimal punctuation",
+    "dialogue_ratio": 0.2
+  },
+  "vocabulary": {
+    "complexity": "complex",
+    "reading_level": 9.5
+  },
+  "signature": {
+    "techniques": [
+      "No quotation marks for dialogue",
+      "Biblical/archaic language",
+      "Sparse punctuation",
+      "Long flowing sentences",
+      "Minimal attribution"
+    ],
+    "common_themes": [
+      "Violence and mortality",
+      "Man vs nature",
+      "Existential bleakness",
+      "Mythic journey narratives"
+    ]
+  },
+  "style_descriptor": "Cormac McCarthy's sparse literary prose with biblical cadence, minimal punctuation, long flowing sentences, dark existential themes"
+}

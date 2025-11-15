@@ -1,0 +1,62 @@
+# BookWritingTool Configuration
+
+app:
+  name: "BookWritingTool"
+  version: "0.1.0"
+  auto_save_interval: 30  # seconds
+
+llm:
+  mode: "online"  # online or offline
+  primary_provider: "claude"  # claude, gpt, ollama
+
+  # Online settings
+  online:
+    claude_model: "claude-sonnet-4-5-20250929"
+    gpt_model: "gpt-4-turbo"
+    max_tokens: 4000
+    temperature: 0.7
+
+  # Offline settings
+  offline:
+    ollama_base_url: "http://localhost:11434"
+    ollama_model: "llama3.1:8b"
+
+  # Cost limits
+  cost_tracking:
+    enabled: true
+    monthly_budget: 50.00  # USD
+    warn_at_percentage: 75
+
+style:
+  default_tone: 0.5  # 0.0 = dark, 1.0 = light
+  default_formality: 0.5  # 0.0 = casual, 1.0 = formal
+  default_sentence_length: 0.5  # 0.0 = short, 1.0 = long
+
+semantic_search:
+  model: "all-MiniLM-L6-v2"
+  chunk_size: 500  # words
+  chunk_overlap: 50  # words
+
+scraper:
+  enabled: true
+  schedule: "weekly"  # weekly, daily
+  day_of_week: "tuesday"  # monday, tuesday, etc.
+  time: "02:00"  # 24-hour format
+  sources:
+    - amazon
+    - nyt
+    - usatoday
+  headless: true
+
+export:
+  default_format: "docx"  # docx, pdf, txt
+  include_chapter_headers: true
+  font_family: "Times New Roman"
+  font_size: 12
+  line_spacing: 2.0  # double-spaced
+
+paths:
+  projects: "projects"
+  data: "data"
+  library: "library"
+  logs: "logs"

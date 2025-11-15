@@ -1,0 +1,81 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# UV
+.uv/
+
+# PyQt
+*.ui~
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/*.log
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration (contains API keys)
+config/api_keys.encrypted
+config/*.key
+
+# User data
+projects/*/
+library/*.faiss
+library/*.chunks
+data/bestsellers/*.json
+data/bestsellers/*.db
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Exports
+exports/
+*.docx
+*.pdf
+*.epub
+*.mobi
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+.cache/
+
+# Playwright
+.playwright/
