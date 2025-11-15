@@ -44,7 +44,9 @@ sounddevice>=0.4.6
 soundfile>=0.12.0
 pyaudio>=0.2.13  # Alternative audio backend
 
-# Text-to-Speech (Kokoro placeholder - install separately)
+# Text-to-Speech
+piper-tts>=1.2.0  # Fast, local neural TTS
+onnxruntime>=1.16.0  # Required for Piper
 # TTS>=0.13.0  # Optional: Coqui TTS as alternative
 
 # Wake Word Detection
@@ -88,12 +90,14 @@ spacy>=3.6.0
 # OPTIONAL DEPENDENCIES
 # ============================================================================
 
-# Development
+# Development & Testing
 ipython>=8.12.0
 jupyter>=1.0.0
 black>=23.0.0
 flake8>=6.0.0
 pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.1
 
 # Logging & Monitoring
 loguru>=0.7.0

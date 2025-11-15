@@ -30,13 +30,15 @@ except ImportError:
     RESEMBLYZER_AVAILABLE = False
     logging.warning("Resemblyzer not available - speaker verification disabled")
 
-# TTS - Kokoro (using sounddevice for playback)
+# TTS - Piper
 try:
-    import onnxruntime as ort
-    KOKORO_AVAILABLE = True
+    from piper import PiperVoice
+    import wave
+    import io
+    PIPER_AVAILABLE = True
 except ImportError:
-    KOKORO_AVAILABLE = False
-    logging.warning("ONNX Runtime not available - TTS disabled")
+    PIPER_AVAILABLE = False
+    logging.warning("Piper-TTS not available - TTS disabled")
 
 import torch
 
@@ -107,16 +109,34 @@ class VALVoiceSystem:
         logger.info(f"STT model loaded: {model_size} on {device}")
 
     def _init_tts(self):
-        """Initialize Kokoro TTS"""
-        if not KOKORO_AVAILABLE:
-            logger.warning("TTS not available")
+        """Initialize Piper TTS"""
+        if not PIPER_AVAILABLE:
+            logger.warning("TTS not available - Piper not installed")
             self.tts_available = False
+            self.piper_voice = None
             return
 
-        # Kokoro TTS would be initialized here
-        # For now, using simple text-to-speech notification
-        self.tts_available = True
-        logger.info("TTS system ready (Kokoro placeholder)")
+        try:
+            # Get TTS model path from config
+            model_path = self.config.get('tts', {}).get('model_path', 'models/en_US-lessac-medium.onnx')
+
+            # Check if model file exists
+            if not Path(model_path).exists():
+                logger.warning(f"TTS model not found at {model_path}")
+                logger.info("Download models from: https://github.com/rhasspy/piper/releases")
+                self.tts_available = False
+                self.piper_voice = None
+                return
+
+            # Initialize Piper voice
+            self.piper_voice = PiperVoice.load(model_path)
+            self.tts_available = True
+            logger.info(f"TTS system ready: Piper ({model_path})")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize Piper TTS: {e}")
+            self.tts_available = False
+            self.piper_voice = None
 
     def _init_wake_word(self):
         """Initialize Porcupine wake word detection"""
@@ -234,23 +254,34 @@ class VALVoiceSystem:
 
     def synthesize_speech(self, text: str) -> Optional[np.ndarray]:
         """
-        Synthesize speech from text using Kokoro TTS
+        Synthesize speech from text using Piper TTS
 
         Args:
             text: Text to synthesize
 
         Returns:
-            Audio data as numpy array or None if TTS unavailable
+            Audio data as numpy array (int16, 22050 Hz) or None if TTS unavailable
         """
-        if not self.tts_available:
+        if not self.tts_available or self.piper_voice is None:
             logger.warning(f"TTS not available, would speak: {text}")
             return None
 
         try:
-            # TODO: Implement Kokoro TTS synthesis
-            # For now, just log the text
             logger.info(f"TTS: {text}")
-            return None
+
+            # Synthesize speech using Piper
+            # Piper returns audio as a generator of numpy arrays
+            audio_chunks = []
+            for audio_chunk in self.piper_voice.synthesize(text):
+                audio_chunks.append(audio_chunk)
+
+            # Concatenate all chunks
+            if audio_chunks:
+                audio_data = np.concatenate(audio_chunks)
+                return audio_data
+            else:
+                logger.warning("No audio generated from TTS")
+                return None
 
         except Exception as e:
             logger.error(f"TTS error: {e}")
