@@ -195,7 +195,16 @@ class NetworkFallbackManager:
         Returns:
             Version number or None
         """
-        # Placeholder - would query server
+        try:
+            server_url = self.get_server_url()
+            response = requests.get(
+                f"{server_url}/api/conversation/{conversation_id}/version",
+                timeout=5
+            )
+            if response.status_code == 200:
+                return response.json().get('version')
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Failed to get server conversation version: {e}")
         return None
 
     def _get_server_file_timestamp(self, file_path: str) -> Optional[str]:
@@ -208,7 +217,17 @@ class NetworkFallbackManager:
         Returns:
             ISO timestamp or None
         """
-        # Placeholder - would query server
+        try:
+            server_url = self.get_server_url()
+            response = requests.get(
+                f"{server_url}/api/file/timestamp",
+                params={'path': file_path},
+                timeout=5
+            )
+            if response.status_code == 200:
+                return response.json().get('timestamp')
+        except requests.exceptions.RequestException as e:
+            logger.warning(f"Failed to get server file timestamp: {e}")
         return None
 
     def _fetch_from_server(self, message: Dict):
@@ -218,8 +237,34 @@ class NetworkFallbackManager:
         Args:
             message: Message with reference info
         """
-        # Placeholder - would fetch from server
-        pass
+        try:
+            server_url = self.get_server_url()
+            message_type = message.get('type')
+
+            if message_type == 'conversation':
+                conversation_id = message.get('conversation_id')
+                response = requests.get(
+                    f"{server_url}/api/conversation/{conversation_id}",
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    logger.info(f"Fetched latest conversation {conversation_id} from server")
+                    return response.json()
+
+            elif message_type == 'file_edit':
+                file_path = message.get('file_path')
+                response = requests.get(
+                    f"{server_url}/api/file/content",
+                    params={'path': file_path},
+                    timeout=10
+                )
+                if response.status_code == 200:
+                    logger.info(f"Fetched latest file {file_path} from server")
+                    return response.json()
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to fetch from server: {e}")
+        return None
 
     def _merge_changes(self, message: Dict):
         """
@@ -228,8 +273,51 @@ class NetworkFallbackManager:
         Args:
             message: Message with changes
         """
-        # Placeholder - would implement merge logic
-        pass
+        message_type = message.get('type')
+
+        if message_type == 'conversation':
+            # Fetch server version
+            server_data = self._fetch_from_server(message)
+            if not server_data:
+                logger.error("Cannot merge: failed to fetch server data")
+                return
+
+            # Simple merge: append local messages to server conversation
+            local_messages = message.get('messages', [])
+            server_messages = server_data.get('messages', [])
+
+            # Combine unique messages by timestamp
+            merged_messages = list(server_messages)
+            server_timestamps = {msg.get('timestamp') for msg in server_messages}
+
+            for msg in local_messages:
+                if msg.get('timestamp') not in server_timestamps:
+                    merged_messages.append(msg)
+
+            # Sort by timestamp
+            merged_messages.sort(key=lambda m: m.get('timestamp', ''))
+
+            # Update message with merged data
+            message['messages'] = merged_messages
+            message['version'] = server_data.get('version', 0) + 1
+
+            # Send merged version to server
+            self.send_to_server(message)
+            logger.info(f"Merged conversation changes: {len(merged_messages)} total messages")
+
+        elif message_type == 'file_edit':
+            # For file edits, simple strategy: use local version if more recent
+            local_timestamp = message.get('timestamp', '')
+            server_timestamp = self._get_server_file_timestamp(message.get('file_path'))
+
+            if local_timestamp > (server_timestamp or ''):
+                # Local is newer, send to server
+                self.send_to_server(message)
+                logger.info("Merged file changes: keeping local version (newer)")
+            else:
+                # Server is newer, fetch from server
+                self._fetch_from_server(message)
+                logger.info("Merged file changes: keeping server version (newer)")
 
     def resolve_conflict(self, conflict: Dict, resolution: str = "keep_local"):
         """

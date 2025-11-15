@@ -38,6 +38,7 @@ pynvml>=11.5.0
 # Voice Processing
 faster-whisper>=0.10.0
 openai-whisper>=20230314  # Fallback
+pyttsx3>=2.90
 
 # Audio I/O
 sounddevice>=0.4.6

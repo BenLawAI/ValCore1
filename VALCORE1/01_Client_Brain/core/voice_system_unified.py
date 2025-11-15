@@ -38,6 +38,14 @@ except ImportError:
     KOKORO_AVAILABLE = False
     logging.warning("ONNX Runtime not available - TTS disabled")
 
+# TTS - pyttsx3 (simple, reliable fallback)
+try:
+    import pyttsx3
+    PYTTSX3_AVAILABLE = True
+except ImportError:
+    PYTTSX3_AVAILABLE = False
+    logging.warning("pyttsx3 not available - basic TTS disabled")
+
 import torch
 
 
@@ -107,16 +115,19 @@ class VALVoiceSystem:
         logger.info(f"STT model loaded: {model_size} on {device}")
 
     def _init_tts(self):
-        """Initialize Kokoro TTS"""
-        if not KOKORO_AVAILABLE:
-            logger.warning("TTS not available")
-            self.tts_available = False
-            return
+        """Initialize TTS (pyttsx3)"""
+        if PYTTSX3_AVAILABLE:
+            try:
+                self.tts_engine = pyttsx3.init()
+                self.tts_available = True
+                logger.info("TTS system ready (pyttsx3)")
+                return
+            except Exception as e:
+                logger.error(f"Failed to initialize pyttsx3: {e}")
 
-        # Kokoro TTS would be initialized here
-        # For now, using simple text-to-speech notification
-        self.tts_available = True
-        logger.info("TTS system ready (Kokoro placeholder)")
+        logger.warning("TTS not available")
+        self.tts_available = False
+        self.tts_engine = None
 
     def _init_wake_word(self):
         """Initialize Porcupine wake word detection"""
@@ -232,29 +243,42 @@ class VALVoiceSystem:
             logger.error(f"Transcription error: {e}")
             return ""
 
+    def speak(self, text: str) -> bool:
+        """
+        Speak text using TTS
+
+        Args:
+            text: Text to speak
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.tts_available or not self.tts_engine:
+            logger.warning(f"TTS not available, would speak: {text}")
+            return False
+
+        try:
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()
+            logger.info(f"TTS: {text}")
+            return True
+
+        except Exception as e:
+            logger.error(f"TTS error: {e}")
+            return False
+
     def synthesize_speech(self, text: str) -> Optional[np.ndarray]:
         """
-        Synthesize speech from text using Kokoro TTS
+        Synthesize speech from text (legacy method, calls speak())
 
         Args:
             text: Text to synthesize
 
         Returns:
-            Audio data as numpy array or None if TTS unavailable
+            None (uses speak() for actual TTS)
         """
-        if not self.tts_available:
-            logger.warning(f"TTS not available, would speak: {text}")
-            return None
-
-        try:
-            # TODO: Implement Kokoro TTS synthesis
-            # For now, just log the text
-            logger.info(f"TTS: {text}")
-            return None
-
-        except Exception as e:
-            logger.error(f"TTS error: {e}")
-            return None
+        self.speak(text)
+        return None
 
     def verify_speaker(self, audio_data: np.ndarray, profile_name: str = "ben_voice") -> bool:
         """
