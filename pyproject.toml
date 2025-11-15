@@ -1,0 +1,181 @@
+[project]
+name = "valcore1"
+version = "1.0.0"
+description = "VALCORE1 - Advanced AI Voice Assistant System with Client-Server Architecture"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+    { name = "Ben", email = "ben@example.com" }
+]
+keywords = ["ai", "voice-assistant", "llm", "automation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+
+# Core dependencies (required for both client and server)
+dependencies = [
+    # Deep Learning
+    "torch>=2.4.1",
+    "torchaudio>=2.4.1",
+
+    # Data Science
+    "numpy>=1.26.4",
+
+    # HTTP & Networking
+    "requests>=2.32.3",
+    "aiohttp>=3.10.5",
+
+    # Data Validation
+    "pydantic>=2.9.2",
+
+    # Utilities
+    "python-dotenv>=1.0.1",
+
+    # System Monitoring
+    "psutil>=6.0.0",
+    "pynvml>=12.560.30",
+
+    # LLM Interface
+    "ollama>=0.3.3",
+]
+
+[project.optional-dependencies]
+# Client Brain Dependencies (Desktop - Windows)
+client = [
+    # Voice Processing
+    "faster-whisper>=0.10.0",
+    "ctranslate2>=3.0.0",
+    "av>=10.0.0",
+
+    # TTS (kokoro-onnx may not be available on PyPI, making it optional)
+    # "kokoro-onnx>=0.1.1",  # Install separately if needed
+    "onnxruntime-gpu>=1.16.0",
+
+    # Audio I/O
+    "sounddevice>=0.4.7",
+    "pyaudio>=0.2.14",
+
+    # Wake Word Detection (requires Picovoice API key)
+    # "pvporcupine>=3.0.2",  # Install separately with API key
+
+    # Speaker Verification (may need to install from git)
+    # "resemblyzer>=0.1.1.dev0",  # Install from git if needed
+
+    # Desktop Automation
+    "pyautogui>=0.9.54",
+    "pillow>=10.4.0",
+    "pytesseract>=0.3.13",
+    "keyboard>=0.13.5",
+    "pygetwindow>=0.0.9",
+
+    # System Tray
+    "pystray>=0.19.5",
+
+    # Windows-Specific
+    "pywin32>=306; sys_platform == 'win32'",
+]
+
+# Server Brain Dependencies (ATOM - Linux)
+server = [
+    # Vector Database
+    "faiss-cpu>=1.8.0",
+
+    # Embeddings
+    "sentence-transformers>=3.1.1",
+
+    # Task Scheduling
+    "schedule>=1.2.2",
+
+    # Web Framework (for client bridge)
+    "flask>=3.0.3",
+    "flask-cors>=5.0.0",
+]
+
+# Development Dependencies
+dev = [
+    "ipython>=8.12.0",
+    "jupyter>=1.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "pytest>=7.4.0",
+    "loguru>=0.7.0",
+    "tqdm>=4.65.0",
+]
+
+# All dependencies combined
+all = [
+    "valcore1[client,server,dev]",
+]
+
+[project.scripts]
+valcore1-client = "VALCORE1.01_Client_Brain.main_client:main"
+valcore1-server = "VALCORE1.02_Server_Brain.main_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["VALCORE1"]
+
+[tool.uv]
+# UV-specific configuration
+dev-dependencies = [
+    "ipython>=8.12.0",
+    "pytest>=7.4.0",
+]
+
+# Use pip-compile style resolution
+index-url = "https://pypi.org/simple"
+
+# For PyTorch with CUDA support on Windows
+[[tool.uv.index]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu121"
+explicit = true
+
+[tool.uv.sources]
+# Source configuration for UV
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+  | __pycache__
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
