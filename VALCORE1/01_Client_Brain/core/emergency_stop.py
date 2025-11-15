@@ -20,9 +20,17 @@ STATE_DIR = Path("A:/000_START_HERE/VALCORE1_ROOT/Systems/VALCORE1/.state")
 class EmergencyStop:
     """Emergency shutdown system with state preservation"""
 
-    def __init__(self):
-        """Initialize emergency stop system"""
+    def __init__(self, voice_system=None, command_queue=None):
+        """
+        Initialize emergency stop system
+
+        Args:
+            voice_system: Reference to voice system for checking mic state
+            command_queue: Reference to command queue for checking pending commands
+        """
         self.enabled = True
+        self.voice_system = voice_system
+        self.command_queue = command_queue
         self.state_dir = Path(".state")  # Relative to current directory
         self.state_dir.mkdir(exist_ok=True)
 
@@ -55,8 +63,24 @@ class EmergencyStop:
         Returns:
             List of pending commands
         """
-        # Placeholder - would integrate with actual command queue
-        return []
+        if self.command_queue is None:
+            return []
+
+        try:
+            # Try to get all items from queue without blocking
+            commands = []
+            while not self.command_queue.empty():
+                try:
+                    commands.append(self.command_queue.get_nowait())
+                except:
+                    break
+            # Put them back
+            for cmd in commands:
+                self.command_queue.put(cmd)
+            return commands
+        except Exception as e:
+            logger.error(f"Error accessing command queue: {e}")
+            return []
 
     def get_mic_state(self) -> str:
         """
@@ -65,8 +89,18 @@ class EmergencyStop:
         Returns:
             "enabled" or "disabled"
         """
-        # Placeholder - would check actual voice system
-        return "enabled"
+        if self.voice_system is None:
+            return "unknown"
+
+        try:
+            # Check if voice system microphone is enabled
+            if hasattr(self.voice_system, 'microphone_enabled'):
+                return "enabled" if self.voice_system.microphone_enabled else "disabled"
+            else:
+                return "unknown"
+        except Exception as e:
+            logger.error(f"Error checking mic state: {e}")
+            return "unknown"
 
     def save_checkpoint(self, reason: str = "emergency_stop"):
         """

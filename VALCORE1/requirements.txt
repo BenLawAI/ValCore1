@@ -44,7 +44,8 @@ sounddevice>=0.4.6
 soundfile>=0.12.0
 pyaudio>=0.2.13  # Alternative audio backend
 
-# Text-to-Speech (Kokoro placeholder - install separately)
+# Text-to-Speech
+pyttsx3>=2.90  # Primary TTS for fast, responsive voice output
 # TTS>=0.13.0  # Optional: Coqui TTS as alternative
 
 # Wake Word Detection

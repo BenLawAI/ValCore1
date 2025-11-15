@@ -30,13 +30,20 @@ except ImportError:
     RESEMBLYZER_AVAILABLE = False
     logging.warning("Resemblyzer not available - speaker verification disabled")
 
-# TTS - Kokoro (using sounddevice for playback)
+# TTS - pyttsx3 (Primary) and Kokoro (Optional)
+try:
+    import pyttsx3
+    PYTTSX3_AVAILABLE = True
+except ImportError:
+    PYTTSX3_AVAILABLE = False
+    logging.warning("pyttsx3 not available - TTS disabled")
+
 try:
     import onnxruntime as ort
     KOKORO_AVAILABLE = True
 except ImportError:
     KOKORO_AVAILABLE = False
-    logging.warning("ONNX Runtime not available - TTS disabled")
+    logging.warning("ONNX Runtime not available - Kokoro TTS disabled")
 
 import torch
 
@@ -107,16 +114,35 @@ class VALVoiceSystem:
         logger.info(f"STT model loaded: {model_size} on {device}")
 
     def _init_tts(self):
-        """Initialize Kokoro TTS"""
-        if not KOKORO_AVAILABLE:
-            logger.warning("TTS not available")
+        """Initialize pyttsx3 TTS"""
+        if not PYTTSX3_AVAILABLE:
+            logger.warning("pyttsx3 not available - TTS disabled")
             self.tts_available = False
+            self.tts_engine = None
             return
 
-        # Kokoro TTS would be initialized here
-        # For now, using simple text-to-speech notification
-        self.tts_available = True
-        logger.info("TTS system ready (Kokoro placeholder)")
+        try:
+            # Initialize pyttsx3 engine
+            self.tts_engine = pyttsx3.init()
+
+            # Configure voice properties
+            voices = self.tts_engine.getProperty('voices')
+            self.tts_engine.setProperty('rate', self.config['tts'].get('rate', 175))
+            self.tts_engine.setProperty('volume', self.config['tts'].get('volume', 0.9))
+
+            # Use first available voice (can be customized in config)
+            if voices:
+                voice_index = self.config['tts'].get('voice_index', 0)
+                if voice_index < len(voices):
+                    self.tts_engine.setProperty('voice', voices[voice_index].id)
+
+            self.tts_available = True
+            logger.info("pyttsx3 TTS system initialized successfully")
+
+        except Exception as e:
+            logger.error(f"Failed to initialize pyttsx3: {e}")
+            self.tts_available = False
+            self.tts_engine = None
 
     def _init_wake_word(self):
         """Initialize Porcupine wake word detection"""
@@ -232,29 +258,43 @@ class VALVoiceSystem:
             logger.error(f"Transcription error: {e}")
             return ""
 
+    def speak(self, text: str) -> bool:
+        """
+        Speak text using pyttsx3 TTS
+
+        Args:
+            text: Text to speak
+
+        Returns:
+            True if speech succeeded, False otherwise
+        """
+        if not self.tts_available or not self.tts_engine:
+            logger.warning(f"TTS not available, would speak: {text}")
+            return False
+
+        try:
+            logger.info(f"Speaking: {text}")
+            self.tts_engine.say(text)
+            self.tts_engine.runAndWait()
+            return True
+
+        except Exception as e:
+            logger.error(f"TTS error: {e}")
+            return False
+
     def synthesize_speech(self, text: str) -> Optional[np.ndarray]:
         """
-        Synthesize speech from text using Kokoro TTS
+        Synthesize speech from text (legacy method for compatibility)
+        Now uses pyttsx3 via speak() method
 
         Args:
             text: Text to synthesize
 
         Returns:
-            Audio data as numpy array or None if TTS unavailable
+            None (pyttsx3 handles playback directly)
         """
-        if not self.tts_available:
-            logger.warning(f"TTS not available, would speak: {text}")
-            return None
-
-        try:
-            # TODO: Implement Kokoro TTS synthesis
-            # For now, just log the text
-            logger.info(f"TTS: {text}")
-            return None
-
-        except Exception as e:
-            logger.error(f"TTS error: {e}")
-            return None
+        self.speak(text)
+        return None
 
     def verify_speaker(self, audio_data: np.ndarray, profile_name: str = "ben_voice") -> bool:
         """
